@@ -44,30 +44,12 @@ namespace NeuralNetwork.Core.Models
             if (index > Layers.Count - 1)
                 throw new IndexOutOfRangeException("Cannot insert hidden layer at output layer index or after.");
 
-            Layer layer = new();
-            layer.Neurons = new();
-            for (int i = 0; i < amountOfNeurons; i++)
-            {
-                layer.Neurons.Add(new());
-                for (int j = 0; j < Layers[index].Neurons.Count; j++)
-                {
-                    layer.Neurons[i].Weights.Add(0);
-                }
-            }
-
-            for (int i = 0; i < Layers[index - 1].Neurons.Count; i++)
-            {
-                Layers[index - 1].Neurons[i].Weights = new();
-                for (int j = 0; j < amountOfNeurons; j++)
-                {
-                    Layers[index - 1].Neurons[i].Weights.Add(0);
-                }
-            }
-
+            Layer layer = CreateNewLayer(amountOfNeurons, Layers[index].Neurons.Count);
+            AdaptWeights(Layers[index - 1], amountOfNeurons);
             Layers.Insert(index, layer);
         }
 
-        public void RemoveLayer(int index)
+        public void RemoveHiddenLayer(int index)
         {
             if (index < 1)
                 throw new IndexOutOfRangeException("Cannot remove input layer or any non-existing layer below.");
@@ -80,12 +62,72 @@ namespace NeuralNetwork.Core.Models
             if (Layers[index].Neurons.Count == Layers[index - 1].Neurons[0].Weights.Count)
                 return;
             
-            for (int i = 0; i < Layers[index - 1].Neurons.Count; i++)
+            AdaptWeights(Layers[index - 1], Layers[index].Neurons.Count);
+        }
+
+        public void ChangeLayerNeuronAmount(int index, int amountOfNeurons)
+        {
+            if (index < 0 || index > Layers.Count - 1)
+                throw new IndexOutOfRangeException();
+
+            if (index == Layers.Count - 1)
+                EditLayer(Layers[index], amountOfNeurons, null);
+            else
+                EditLayer(Layers[index], amountOfNeurons, Layers[index + 1].Neurons.Count);
+
+            AdaptWeights(Layers[index-1], amountOfNeurons);
+        }
+
+        private Layer CreateNewLayer(int amountOfNeurons, int amountOfWeights)
+        {
+            Layer layer = new();
+            layer.Neurons = new();
+            for (int i = 0; i < amountOfNeurons; i++)
             {
-                Layers[index - 1].Neurons[i].Weights = new();
-                for (int j = 0; j < Layers[index].Neurons.Count; j++)
+                layer.Neurons.Add(new());
+                for (int j = 0; j < amountOfWeights; j++)
                 {
-                    Layers[index - 1].Neurons[i].Weights.Add(0);
+                    layer.Neurons[i].Weights.Add(0);
+                }
+            }
+            return layer;
+        }
+
+        private void EditLayer(Layer layer, int amountOfNeurons, int? amountOfWeights)
+        {
+            layer.Neurons = new();
+            for (int i = 0; i < amountOfNeurons; i++)
+            {
+                layer.Neurons.Add(new());
+            }
+
+            if (amountOfWeights == null)
+            {
+                for (int i = 0; i < amountOfNeurons; i++)
+                {
+                    layer.Neurons[i].Weights = null;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < amountOfNeurons; i++)
+                {
+                    for (int j = 0; j < amountOfWeights; j++)
+                    {
+                        layer.Neurons[i].Weights.Add(0);
+                    }
+                }
+            }
+        }
+
+        private void AdaptWeights(Layer layer, int amountOfWeights)
+        {
+            for (int i = 0; i < layer.Neurons.Count; i++)
+            {
+                layer.Neurons[i].Weights = new();
+                for (int j = 0; j < amountOfWeights; j++)
+                {
+                    layer.Neurons[i].Weights.Add(0);
                 }
             }
         }
