@@ -58,7 +58,7 @@ namespace NeuralNetwork.Core.Tests
         }
 
         [Fact]
-        public void RemoveLayer_ShouldRemoveCorrectly()
+        public void RemoveHiddenLayer_ShouldRemoveCorrectly()
         {
             NetworkConfiguration configuration = new NetworkConfiguration
             {
@@ -68,7 +68,7 @@ namespace NeuralNetwork.Core.Tests
 
             Network network = new(configuration);
 
-            network.RemoveLayer(2);
+            network.RemoveHiddenLayer(2);
 
             // { 3, 4, 5 }
             Assert.Equal(3, network.Layers.Count);
@@ -78,6 +78,53 @@ namespace NeuralNetwork.Core.Tests
             Assert.Equal(5, network.Layers[1].Neurons[3].Weights.Count);
             Assert.Null(network.Layers[2].Neurons[0].Weights);
             Assert.Null(network.Layers[2].Neurons[4].Weights);
+        }
+
+        [Fact]
+        public void ChangeLayerNeuronAmount_ShouldChangeCorrectlyForHidden()
+        {
+            NetworkConfiguration configuration = new NetworkConfiguration
+            {
+                NumberOfLayers = 4,
+                NeuronAmounts = new int[] { 3, 4, 7, 5 },
+            };
+
+            Network network = new(configuration);
+
+            network.ChangeLayerNeuronAmount(2, 3);
+
+            // { 3, 4, 3, 5 }
+            Assert.Equal(4, network.Layers.Count);
+            Assert.Equal(3, network.Layers[2].Neurons.Count);
+            Assert.Equal(4, network.Layers[1].Neurons.Count);
+            Assert.Equal(5, network.Layers[3].Neurons.Count);
+            Assert.Equal(5, network.Layers[2].Neurons[0].Weights.Count);
+            Assert.Equal(5, network.Layers[2].Neurons[2].Weights.Count);
+            Assert.Equal(3, network.Layers[1].Neurons[0].Weights.Count);
+            Assert.Equal(3, network.Layers[1].Neurons[3].Weights.Count);
+        }
+
+        [Fact]
+        public void ChangeLayerNeuronAmount_ShouldChangeCorrectlyForOutput()
+        {
+            NetworkConfiguration configuration = new NetworkConfiguration
+            {
+                NumberOfLayers = 4,
+                NeuronAmounts = new int[] { 3, 4, 3, 5 },
+            };
+
+            Network network = new(configuration);
+
+            network.ChangeLayerNeuronAmount(3, 2);
+
+            // { 3, 4, 3, 2 }
+            Assert.Equal(4, network.Layers.Count);
+            Assert.Equal(2, network.Layers[3].Neurons.Count);
+            Assert.Equal(3, network.Layers[2].Neurons.Count);
+            Assert.Equal(2, network.Layers[2].Neurons[0].Weights.Count);
+            Assert.Equal(2, network.Layers[2].Neurons[2].Weights.Count);
+            Assert.Null(network.Layers[3].Neurons[0].Weights);
+            Assert.Null(network.Layers[3].Neurons[1].Weights);
         }
     }
 }
