@@ -8,7 +8,7 @@ namespace NeuralNetwork.Core.Models
 {
     public class Neuron
     {
-        public List<float> Weights { get; set; } = new();
-        public float Value { get; set; }
+        public List<double> Weights { get; set; } = new();
+        public double Value { get; set; }
     }
 }
