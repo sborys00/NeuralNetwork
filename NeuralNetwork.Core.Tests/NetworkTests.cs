@@ -126,5 +126,82 @@ namespace NeuralNetwork.Core.Tests
             Assert.Null(network.Layers[3].Neurons[0].Weights);
             Assert.Null(network.Layers[3].Neurons[1].Weights);
         }
+
+        [Fact]
+        public void InitializeWeightsForLayer_AllShouldBeInBounds()
+        {
+            NetworkConfiguration configuration = new NetworkConfiguration
+            {
+                NumberOfLayers = 4,
+                NeuronAmounts = new int[] { 3, 4, 7, 5 },
+            };
+
+            Network network = new(configuration);
+
+            double upperBound = Math.Sqrt(6.0) / Math.Sqrt(3 + 7);
+            double lowerBound = -upperBound;
+
+            network.InitializeWeightsForLayer(1);
+
+            for (int i = 0; i < 7; i++)
+            {
+                Assert.InRange(network.Layers[1].Neurons[0].Weights[i], lowerBound, upperBound);
+                Assert.InRange(network.Layers[1].Neurons[1].Weights[i], lowerBound, upperBound);
+                Assert.InRange(network.Layers[1].Neurons[2].Weights[i], lowerBound, upperBound);
+                Assert.InRange(network.Layers[1].Neurons[3].Weights[i], lowerBound, upperBound);
+            }
+        }
+
+        [Fact]
+        public void InitializeWeights_AllShouldBeInBound()
+        {
+            NetworkConfiguration configuration = new NetworkConfiguration
+            {
+                NumberOfLayers = 4,
+                NeuronAmounts = new int[] { 3, 4, 7, 5 },
+            };
+
+            Network network = new(configuration);
+
+            network.InitializeWeights();
+
+            double[] upperBounds = 
+            {
+                Math.Sqrt(6.0) / Math.Sqrt(0 + 4),
+                Math.Sqrt(6.0) / Math.Sqrt(3 + 7),
+                Math.Sqrt(6.0) / Math.Sqrt(4 + 5),
+            };
+
+            double[] lowerBounds =
+            {
+                -upperBounds[0],
+                -upperBounds[1],
+                -upperBounds[2],
+            };
+
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    Assert.InRange(network.Layers[0].Neurons[i].Weights[j], lowerBounds[0], upperBounds[0]);
+                }
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    Assert.InRange(network.Layers[1].Neurons[i].Weights[j], lowerBounds[1], upperBounds[1]);
+                }
+            }
+
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    Assert.InRange(network.Layers[2].Neurons[i].Weights[j], lowerBounds[2], upperBounds[2]);
+                }
+            }
+        }
     }
 }
