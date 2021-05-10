@@ -65,6 +65,62 @@ namespace NeuralNetwork.Core.Models
             AdaptWeights(Layers[index-1], amountOfNeurons);
         }
 
+        public void InitializeWeights()
+        {
+            for (int i = 0; i < Layers.Count - 1; i++)
+            {
+                InitializeWeightsForLayer(i);
+            }
+        }
+
+        public void InitializeWeightsForLayer(int index)
+        {
+            if (index < 0)
+                throw new IndexOutOfRangeException();
+
+            if (index > Layers.Count - 2)
+                throw new IndexOutOfRangeException();
+
+            // Uses Normalized Xavier Weight Initialization
+            CalculateWeightBoundsForLayer(index, out double upperBound, out double lowerBound);
+            Layer layer = Layers[index];
+            InitializeWeightsForLayer(layer, upperBound, lowerBound);
+        }
+
+        private void InitializeWeightsForLayer(Layer layer, double upperBound, double lowerBound)
+        {
+            Random random = new();
+            for (int i = 0; i < layer.Neurons.Count; i++)
+            {
+                for (int j = 0; j < layer.Neurons[i].Weights.Count; j++)
+                {
+                    layer.Neurons[i].Weights[j] = GetRandomDoubleBetween(upperBound, lowerBound, random);
+                }
+            }
+        }
+
+        private double GetRandomDoubleBetween(double upperBound, double lowerBound, Random random)
+        {
+            return lowerBound + (random.NextDouble() * (upperBound - lowerBound));
+        }
+
+        private void CalculateWeightBoundsForLayer(int index, out double upperBound, out double lowerBound)
+        {
+            int lastLayerNodeAmount = 0;
+            if (index != 0)
+                lastLayerNodeAmount = Layers[index - 1].Neurons.Count;
+
+            int nextLayerNodeAmount = Layers[index + 1].Neurons.Count;
+
+            CalculateWeightBounds(lastLayerNodeAmount, nextLayerNodeAmount, out upperBound, out lowerBound);
+        }
+
+        private void CalculateWeightBounds(int lastLayerNodeAmount, int nextLayerNodeAmount, out double upperBound, out double lowerBound)
+        {
+            upperBound = Math.Sqrt(6.0) / Math.Sqrt(lastLayerNodeAmount + nextLayerNodeAmount);
+            lowerBound = -upperBound;
+        }
+
         private Layer CreateNewLayer(int amountOfNeurons, int? amountOfWeights)
         {
             Layer layer = new();
@@ -130,5 +186,7 @@ namespace NeuralNetwork.Core.Models
                 }
             }
         }
+
+
     }
 }
