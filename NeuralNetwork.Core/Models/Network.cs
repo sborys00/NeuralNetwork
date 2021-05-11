@@ -87,6 +87,40 @@ namespace NeuralNetwork.Core.Models
             InitializeWeightsForLayer(layer, upperBound, lowerBound);
         }
 
+        public static double[,] GetWeightsFromLayer(Layer layer)
+        {
+            int nextLayerNeuronAmount = layer.Neurons[0].Weights.Count;
+            double[,] weights = new double[layer.Neurons.Count, nextLayerNeuronAmount];
+            for (int i = 0; i < layer.Neurons.Count; i++)
+            {
+                for (int j = 0; j < nextLayerNeuronAmount; j++)
+                {
+                    weights[i, j] = layer.Neurons[i].Weights[j];
+                }
+            }
+            return weights;
+        }
+
+        public List<List<double>> CalculateOutput(double[] input, Func<double, double> activationFunction)
+        {
+            if (input.Length != Layers[0].Neurons.Count)
+                throw new Exception("Input must contain same amount of nodes as the first layer.");
+
+            double[,] previousWeights = GetWeightsFromLayer(Layers[0]);
+            List<List<double>> inputHistory = new();
+            for (int i = 1; i < Layers.Count; i++)
+            {
+                inputHistory.Add(input.ToList());
+
+                Layers[i].CalculateOutputs(input, previousWeights, activationFunction, out double[] output, out double[,] currentWeights);
+                
+                input = output;
+                previousWeights = currentWeights;
+            }
+            inputHistory.Add(input.ToList());
+            return inputHistory;
+        }
+
         private void InitializeWeightsForLayer(Layer layer, double upperBound, double lowerBound)
         {
             Random random = new();
