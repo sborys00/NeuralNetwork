@@ -203,5 +203,69 @@ namespace NeuralNetwork.Core.Tests
                 }
             }
         }
+
+        [Fact]
+        public void GetWeightsFromLayer_ShouldWork()
+        {
+            NetworkConfiguration configuration = new NetworkConfiguration
+            {
+                NumberOfLayers = 3,
+                NeuronAmounts = new int[] { 3, 4, 7 },
+            };
+
+            Network network = new(configuration);
+            network.Layers[0].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .1, .2, .3, .4 }));
+            network.Layers[1].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .4, .5, .6, .7, .8, .9, .8 }));
+
+            double[,] weights0 = Network.GetWeightsFromLayer(network.Layers[0]);
+            double[,] weights1 = Network.GetWeightsFromLayer(network.Layers[1]);
+
+            Assert.Equal(.2, weights0[0, 1]);
+            Assert.Equal(.3, weights0[0, 2]);
+            Assert.Equal(.3, weights0[1, 2]);
+            Assert.Equal(.5, weights1[1, 1]);
+            Assert.Equal(.6, weights1[2, 2]);
+            Assert.Equal(.7, weights1[3, 3]);
+        }
+
+        [Fact]
+        public void CalculateOutput_ShouldWork()
+        {
+            NetworkConfiguration configuration = new NetworkConfiguration
+            {
+                NumberOfLayers = 3,
+                NeuronAmounts = new int[] { 3, 4, 2 },
+            };
+
+            Network network = new(configuration);
+            network.Layers[0].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .1, .2, .3, .4 }));
+            network.Layers[1].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .4, .5 }));
+
+            /*
+             *     2.4 3
+             * .6 1.2 1.8 2.4
+             *    1   2   3
+             */
+
+            List<List<double>> output = network.CalculateOutput(new double[] { 1, 2, 3 }, x => x);
+
+            Assert.Equal(new double[] { 2.4, 3 }, output.Last().Select(x => Math.Round(x, 2)));
+        }
+
+        [Fact]
+        public void CalculateOutput_ShouldThrowExceptionWhenWrongInput()
+        {
+            NetworkConfiguration configuration = new NetworkConfiguration
+            {
+                NumberOfLayers = 3,
+                NeuronAmounts = new int[] { 3, 4, 7 },
+            };
+
+            Network network = new(configuration);
+            network.Layers[0].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .1, .2, .3 }));
+            network.Layers[1].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .4, .5, .6, .7 }));
+
+            Assert.Throws<Exception>(delegate { network.CalculateOutput(new double[] { 1, 2, 3, 4 }, x => x); });
+        }
     }
 }
