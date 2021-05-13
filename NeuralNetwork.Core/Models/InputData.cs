@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNetwork.Core.Models
 {
-    class InputData
+    public class InputData
     {
         public IEnumerable<string> VariableNames;
         public IEnumerable<IEnumerable<double>> DataSet; 
