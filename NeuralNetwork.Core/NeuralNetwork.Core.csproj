@@ -8,4 +8,8 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.IO.Abstractions" Version="13.2.31" />
+  </ItemGroup>
+
 </Project>
