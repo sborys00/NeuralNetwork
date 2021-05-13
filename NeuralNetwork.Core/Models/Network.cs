@@ -9,6 +9,7 @@ namespace NeuralNetwork.Core.Models
     public class Network
     {
         public List<Layer> Layers { get; set; } = new();
+        public double LearningRate { get; set; } 
 
         public Network(NetworkConfiguration configuration)
         {
