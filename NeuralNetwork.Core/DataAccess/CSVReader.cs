@@ -9,7 +9,7 @@ using System.IO.Abstractions;
 
 namespace NeuralNetwork.Core.DataAccess
 {
-    class CSVReader : IFileReader
+    public class CSVReader : IFileReader
     {
         private readonly IFileSystem _fileSystem;
 

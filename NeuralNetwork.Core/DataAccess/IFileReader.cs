@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNetwork.Core.DataAccess
 {
-    interface IFileReader
+    public interface IFileReader
     {
         public Task<InputData> ReadInputData(string path);
     }
