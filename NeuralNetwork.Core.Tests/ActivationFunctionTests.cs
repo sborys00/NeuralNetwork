@@ -18,8 +18,23 @@ namespace NeuralNetwork.Core.Tests
         [InlineData(3d, 0.95d)]
         public void Sigmoid_ShouldReturnCorrectValues(double x, double expected)
         {
-            double actual = Math.Round(ActivationFuntion.Sigmoid(x), 2);
+            ActivationFuntion func = new SigmoidActivationFunction();
+            double actual = Math.Round(func.Function(x), 2);
             Assert.Equal(Math.Round(expected, 2),  actual);
+        }
+
+        [Theory]
+        [InlineData(1d, 0.46d)]
+        [InlineData(2d, 0.76d)]
+        [InlineData(-4d, -0.96d)]
+        [InlineData(0d, 0d)]
+        [InlineData(14d, 1)]
+        [InlineData(3d, 0.91)]
+        public void SigmoidBipolar_ShouldReturnCorrectValues(double x, double expected)
+        {
+            ActivationFuntion func = new SigmoidBipolarActivationFunction();
+            double actual = Math.Round(func.Function(x), 2);
+            Assert.Equal(Math.Round(expected, 2), actual);
         }
 
         [Theory]
@@ -31,7 +46,8 @@ namespace NeuralNetwork.Core.Tests
         [InlineData(3d, 3d)]
         public void ReLU_ShouldReturnCorrectValues(double x, double expected)
         {
-            double actual = Math.Round(ActivationFuntion.ReLU(x), 2);
+            ActivationFuntion func = new ReLUActivationFunction();
+            double actual = Math.Round(func.Function(x), 2);
             Assert.Equal(Math.Round(expected, 2),  actual);
         }
 
@@ -44,7 +60,8 @@ namespace NeuralNetwork.Core.Tests
         [InlineData(3d, 1d)]
         public void Tanh_ShouldReturnCorrectValues(double x, double expected)
         {
-            double actual = Math.Round(ActivationFuntion.Tanh(x), 2);
+            ActivationFuntion func = new TanhActivationFunction();
+            double actual = Math.Round(func.Function(x), 2);
             Assert.Equal(Math.Round(expected, 2), actual);
         }
     }
