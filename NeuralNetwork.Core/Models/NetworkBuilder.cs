@@ -9,7 +9,7 @@ namespace NeuralNetwork.Core.Models
     public class NetworkBuilder
     {
         /// <summary>
-        /// Creates a new layer with specified amount of neurons and amount of weights for every neuron.
+        /// Creates a layer with specified amount of neurons and amount of weights for every neuron.
         /// </summary>
         /// <param name="amountOfNeurons"></param>
         /// <param name="amountOfWeights"></param>

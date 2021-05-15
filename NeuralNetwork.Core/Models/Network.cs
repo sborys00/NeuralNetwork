@@ -54,6 +54,7 @@ namespace NeuralNetwork.Core.Models
             NetworkBuilder.AdaptWeights(Layers[index - 1], Layers[index].Neurons.Count);
         }
 
+
         public void ChangeLayerNeuronAmount(int index, int amountOfNeurons)
         {
             if (index < 0 || index > Layers.Count - 1)
@@ -67,6 +68,9 @@ namespace NeuralNetwork.Core.Models
             NetworkBuilder.AdaptWeights(Layers[index-1], amountOfNeurons);
         }
 
+        /// <summary>
+        /// Sets initial weight values in all layers using Normalized Xavier Weight Initialization
+        /// </summary>
         public void InitializeWeights()
         {
             for (int i = 0; i < Layers.Count - 1; i++)
@@ -75,20 +79,11 @@ namespace NeuralNetwork.Core.Models
             }
         }
 
-        public void InitializeWeightsForLayer(int index)
-        {
-            if (index < 0)
-                throw new IndexOutOfRangeException();
-
-            if (index > Layers.Count - 2)
-                throw new IndexOutOfRangeException();
-
-            // Uses Normalized Xavier Weight Initialization
-            CalculateWeightBoundsForLayer(index, out double upperBound, out double lowerBound);
-            Layer layer = Layers[index];
-            InitializeWeightsForLayer(layer, upperBound, lowerBound);
-        }
-
+        /// <summary>
+        /// Create a matrix of weights of all neurons in the given Layer object.
+        /// </summary>
+        /// <param name="layer">Layer of which the weights will be in the martix</param>
+        /// <returns>A matrix of double values representing weights of connections from preceding layer to the given one</returns>
         public static double[,] GetWeightsFromLayer(Layer layer)
         {
             int nextLayerNeuronAmount = layer.Neurons[0].Weights.Count;
@@ -121,6 +116,19 @@ namespace NeuralNetwork.Core.Models
             }
             inputHistory.Add(input.ToList());
             return inputHistory;
+        }
+        private void InitializeWeightsForLayer(int index)
+        {
+            if (index < 0)
+                throw new IndexOutOfRangeException();
+
+            if (index > Layers.Count - 2)
+                throw new IndexOutOfRangeException();
+
+            // Uses Normalized Xavier Weight Initialization
+            CalculateWeightBoundsForLayer(index, out double upperBound, out double lowerBound);
+            Layer layer = Layers[index];
+            InitializeWeightsForLayer(layer, upperBound, lowerBound);
         }
 
         private void InitializeWeightsForLayer(Layer layer, double upperBound, double lowerBound)

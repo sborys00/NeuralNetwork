@@ -141,7 +141,7 @@ namespace NeuralNetwork.Core.Tests
             double upperBound = Math.Sqrt(6.0) / Math.Sqrt(3 + 7);
             double lowerBound = -upperBound;
 
-            network.InitializeWeightsForLayer(1);
+            network.InitializeWeights();
 
             for (int i = 0; i < 7; i++)
             {
