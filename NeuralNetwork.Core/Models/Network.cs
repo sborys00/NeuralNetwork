@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NeuralNetwork.Core.ExtensionMethods;
 
 namespace NeuralNetwork.Core.Models
 {
@@ -129,14 +130,9 @@ namespace NeuralNetwork.Core.Models
             {
                 for (int j = 0; j < layer.Neurons[i].Weights.Count; j++)
                 {
-                    layer.Neurons[i].Weights[j] = GetRandomDoubleBetween(upperBound, lowerBound, random);
+                    layer.Neurons[i].Weights[j] = random.GetRandomDoubleBetween(upperBound, lowerBound);
                 }
             }
-        }
-
-        private double GetRandomDoubleBetween(double upperBound, double lowerBound, Random random)
-        {
-            return lowerBound + (random.NextDouble() * (upperBound - lowerBound));
         }
 
         private void CalculateWeightBoundsForLayer(int index, out double upperBound, out double lowerBound)
