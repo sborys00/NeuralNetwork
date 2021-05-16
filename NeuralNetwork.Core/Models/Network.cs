@@ -12,19 +12,7 @@ namespace NeuralNetwork.Core.Models
         public List<Layer> Layers { get; set; } = new();
         public double LearningRate { get; set; } 
         public Func<double, double> ActivationFunction { get; set; }
-
-        public Network(NetworkConfiguration configuration)
-        {
-            // input and hidden layers
-            for (int i = 0; i < configuration.NumberOfLayers - 1; i++)
-            {
-                Layers.Add(NetworkBuilder.CreateNewLayer(configuration.NeuronAmounts[i], configuration.NeuronAmounts[i + 1]));
-            }
-
-            // output layer
-            Layers.Add(NetworkBuilder.CreateNewLayer(configuration.NeuronAmounts[configuration.NumberOfLayers - 1], null));
-        }
-
+        
         public Network()
         {
         }
