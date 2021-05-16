@@ -11,6 +11,7 @@ namespace NeuralNetwork.Core.Models
     {
         public List<Layer> Layers { get; set; } = new();
         public double LearningRate { get; set; } 
+        public Func<double, double> ActivationFunction { get; set; }
 
         public Network(NetworkConfiguration configuration)
         {
@@ -22,6 +23,10 @@ namespace NeuralNetwork.Core.Models
 
             // output layer
             Layers.Add(NetworkBuilder.CreateNewLayer(configuration.NeuronAmounts[configuration.NumberOfLayers - 1], null));
+        }
+
+        public Network()
+        {
         }
 
         // disrupts learned weights - needs initializing afterwards

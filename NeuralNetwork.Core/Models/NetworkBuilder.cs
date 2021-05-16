@@ -8,6 +8,39 @@ namespace NeuralNetwork.Core.Models
 {
     public class NetworkBuilder
     {
+        private readonly Network _network = new Network();
+
+        public NetworkBuilder AddLayers(params int[] neuronsInLayer)
+        {
+            // input and hidden layers
+            for (int i = 0; i < neuronsInLayer.Length - 1; i++)
+            {
+                _network.Layers.Add(NetworkBuilder.CreateNewLayer(neuronsInLayer[i], neuronsInLayer[i + 1]));
+            }
+
+            // output layer
+            _network.Layers.Add(NetworkBuilder.CreateNewLayer(neuronsInLayer[^1], null));
+
+            return this;
+        }
+
+        public NetworkBuilder SetLearningRate(double lr)
+        {
+            _network.LearningRate = lr;
+            return this;
+        }
+
+        public NetworkBuilder SetActivationFunction(Func<double, double> af)
+        {
+            _network.ActivationFunction = af;
+            return this;
+        }
+
+        public Network Build()
+        {
+            return _network;
+        }
+        
         /// <summary>
         /// Creates a layer with specified amount of neurons and amount of weights for every neuron.
         /// </summary>
