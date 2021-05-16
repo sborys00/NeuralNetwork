@@ -13,34 +13,30 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void Constructor_ArraysShouldCorrectlyAllocate()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 3,
-                NeuronAmounts = new int[] { 3, 4, 5 },
-            };
+            int[] NeuronAmounts = new int[] { 3, 4, 5 };
 
-            Network network = new(configuration);
+            NetworkBuilder networkBuilder = new();
 
-            Assert.Equal(configuration.NumberOfLayers, network.Layers.Count);
-            Assert.Equal(configuration.NeuronAmounts[0], network.Layers[0].Neurons.Count);
-            Assert.Equal(configuration.NeuronAmounts[1], network.Layers[1].Neurons.Count);
-            Assert.Equal(configuration.NeuronAmounts[2], network.Layers[2].Neurons.Count);
-            Assert.Equal(configuration.NeuronAmounts[1], network.Layers[0].Neurons[0].Weights.Count);
-            Assert.Equal(configuration.NeuronAmounts[1], network.Layers[0].Neurons[1].Weights.Count);
-            Assert.Equal(configuration.NeuronAmounts[2], network.Layers[1].Neurons[0].Weights.Count);
+            Network network = networkBuilder.AddLayers(NeuronAmounts).Build();
+
+            Assert.Equal(NeuronAmounts.Length, network.Layers.Count);
+            Assert.Equal(NeuronAmounts[0], network.Layers[0].Neurons.Count);
+            Assert.Equal(NeuronAmounts[1], network.Layers[1].Neurons.Count);
+            Assert.Equal(NeuronAmounts[2], network.Layers[2].Neurons.Count);
+            Assert.Equal(NeuronAmounts[1], network.Layers[0].Neurons[0].Weights.Count);
+            Assert.Equal(NeuronAmounts[1], network.Layers[0].Neurons[1].Weights.Count);
+            Assert.Equal(NeuronAmounts[2], network.Layers[1].Neurons[0].Weights.Count);
             Assert.Null(network.Layers[2].Neurons[0].Weights);
         }
 
         [Fact]
         public void InsertHiddenLayer_ShouldInsertCorrectly()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 3,
-                NeuronAmounts = new int[] { 3, 4, 5 },
-            };
+            int[] neuronAmounts = new int[] { 3, 4, 5 };
 
-            Network network = new(configuration);
+            NetworkBuilder networkBuilder = new();
+
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
 
             network.InsertHiddenLayer(2, 7);
 
@@ -60,13 +56,10 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void RemoveHiddenLayer_ShouldRemoveCorrectly()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 4,
-                NeuronAmounts = new int[] { 3, 4, 7, 5 },
-            };
 
-            Network network = new(configuration);
+            int[] neuronAmounts = new int[] { 3, 4, 7, 5 };
+            NetworkBuilder networkBuilder = new();
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
 
             network.RemoveHiddenLayer(2);
 
@@ -83,13 +76,10 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void ChangeLayerNeuronAmount_ShouldChangeCorrectlyForHidden()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 4,
-                NeuronAmounts = new int[] { 3, 4, 7, 5 },
-            };
+            int[] neuronAmounts = new int[] { 3, 4, 7, 5 };
+            NetworkBuilder networkBuilder = new();
 
-            Network network = new(configuration);
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
 
             network.ChangeLayerNeuronAmount(2, 3);
 
@@ -107,13 +97,10 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void ChangeLayerNeuronAmount_ShouldChangeCorrectlyForOutput()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 4,
-                NeuronAmounts = new int[] { 3, 4, 3, 5 },
-            };
+            int[] neuronAmounts = new int[] { 3, 4, 3, 5 };
+            NetworkBuilder networkBuilder = new();
 
-            Network network = new(configuration);
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
 
             network.ChangeLayerNeuronAmount(3, 2);
 
@@ -130,13 +117,10 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void InitializeWeightsForLayer_AllShouldBeInBounds()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 4,
-                NeuronAmounts = new int[] { 3, 4, 7, 5 },
-            };
+            int[] neuronAmounts = new int[] { 3, 4, 7, 5 };
+            NetworkBuilder networkBuilder = new();
 
-            Network network = new(configuration);
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
 
             double upperBound = Math.Sqrt(6.0) / Math.Sqrt(3 + 7);
             double lowerBound = -upperBound;
@@ -155,13 +139,10 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void InitializeWeights_AllShouldBeInBound()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 4,
-                NeuronAmounts = new int[] { 3, 4, 7, 5 },
-            };
+            int[] neuronAmounts = new int[] { 3, 4, 7, 5 };
+            NetworkBuilder networkBuilder = new();
 
-            Network network = new(configuration);
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
 
             network.InitializeWeights();
 
@@ -207,13 +188,11 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void GetWeightsFromLayer_ShouldWork()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 3,
-                NeuronAmounts = new int[] { 3, 4, 7 },
-            };
+            int[] neuronAmounts = new int[] { 3, 4, 7 };
+            NetworkBuilder networkBuilder = new();
 
-            Network network = new(configuration);
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
+
             network.Layers[0].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .1, .2, .3, .4 }));
             network.Layers[1].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .4, .5, .6, .7, .8, .9, .8 }));
 
@@ -231,13 +210,11 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void CalculateOutput_ShouldWork()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 3,
-                NeuronAmounts = new int[] { 3, 4, 2 },
-            };
+            int[] neuronAmounts = new int[] { 3, 4, 2 };
+            NetworkBuilder networkBuilder = new();
 
-            Network network = new(configuration);
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
+
             network.Layers[0].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .1, .2, .3, .4 }));
             network.Layers[1].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .4, .5 }));
 
@@ -255,13 +232,10 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void CalculateOutput_ShouldThrowExceptionWhenWrongInput()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 3,
-                NeuronAmounts = new int[] { 3, 4, 7 },
-            };
+            int[] neuronAmounts = new int[] { 3, 4, 7 };
+            NetworkBuilder networkBuilder = new();
 
-            Network network = new(configuration);
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
             network.Layers[0].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .1, .2, .3 }));
             network.Layers[1].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .4, .5, .6, .7 }));
 
@@ -271,7 +245,9 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void CalculateErrorForOutputLayer_ShouldReturnCorrectValues()
         {
-            Network network = new(new NetworkConfiguration() {NeuronAmounts = new int[] {2, 2 }, NumberOfLayers = 2 });
+            NetworkBuilder networkBuilder = new();
+
+            Network network = networkBuilder.AddLayers(2, 2).Build();
             double[] outputs = { 0.6, 0.4, 0.2, 0, 0.1 };
             double[] targets = { 0.4, 0.2, 0.2, 0.6, 1 };
             double[] actual = network.CalculateErrorForOutputLayer(outputs, targets);

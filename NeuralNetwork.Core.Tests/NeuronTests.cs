@@ -13,13 +13,10 @@ namespace NeuralNetwork.Core.Tests
         [Fact]
         public void CalculateOutput_ShouldWork()
         {
-            NetworkConfiguration configuration = new NetworkConfiguration
-            {
-                NumberOfLayers = 3,
-                NeuronAmounts = new int[] { 3, 4, 5 },
-            };
+            int[] neuronAmounts = new int[] { 4, 3, 5 };
+            NetworkBuilder networkBuilder = new();
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
 
-            Network network = new(configuration);
             network.Layers[0].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .1, .2, .3, .4 }));
             network.Layers[1].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .4, .5, .6, .7, .8 }));
 
