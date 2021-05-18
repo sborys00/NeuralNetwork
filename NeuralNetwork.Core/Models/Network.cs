@@ -15,7 +15,12 @@ namespace NeuralNetwork.Core.Models
         {
         }
 
-        // disrupts learned weights - needs initializing afterwards
+        
+        /// <summary>
+        /// Inserts hidden layer at index, where 0 is input layer and amountOfNeurons - 1 is output layer.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="amountOfNeurons"></param>
         public void InsertHiddenLayer(int index, int amountOfNeurons)
         {
             if (index < 1)
@@ -29,6 +34,10 @@ namespace NeuralNetwork.Core.Models
             Layers.Insert(index, layer);
         }
 
+        /// <summary>
+        /// Removes hidden layer at index, where 0 is input layer and amountOfNeurons - 1 is output layer.
+        /// </summary>
+        /// <param name="index"></param>
         public void RemoveHiddenLayer(int index)
         {
             if (index < 1)
@@ -45,7 +54,11 @@ namespace NeuralNetwork.Core.Models
             NetworkBuilder.AdaptWeights(Layers[index - 1], Layers[index].Neurons.Count);
         }
 
-
+        /// <summary>
+        /// Modifies neuron amount of hidden layer at index, where 0 is input layer and amountOfNeurons - 1 is output layer.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="amountOfNeurons"></param>
         public void ChangeLayerNeuronAmount(int index, int amountOfNeurons)
         {
             if (index < 0 || index > Layers.Count - 1)
@@ -89,6 +102,12 @@ namespace NeuralNetwork.Core.Models
             return weights;
         }
 
+        /// <summary>
+        /// Calculates output list for each layer. Every neuron has one value assigned in return object.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="activationFunction"></param>
+        /// <returns></returns>
         public List<List<double>> CalculateOutput(double[] input, Func<double, double> activationFunction)
         {
             if (input.Length != Layers[0].Neurons.Count)
