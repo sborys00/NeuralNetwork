@@ -6,10 +6,17 @@ using System.Threading.Tasks;
 
 namespace NeuralNetwork.Core.Models
 {
+    /// <summary>
+    /// Used to create an Network object. It follows Fluent Builder design pattern. 
+    /// </summary>
     public class NetworkBuilder
     {
         private readonly Network _network = new Network();
-
+        /// <summary>
+        /// Adds new layers to a neural network, each of them having amount of neurons specified in params.
+        /// </summary>
+        /// <param name="neuronsInLayer">Comma separted integers or an array of ints.</param>
+        /// <returns></returns>
         public NetworkBuilder AddLayers(params int[] neuronsInLayer)
         {
             // input and hidden layers
