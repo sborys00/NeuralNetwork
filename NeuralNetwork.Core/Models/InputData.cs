@@ -9,6 +9,6 @@ namespace NeuralNetwork.Core.Models
     public class InputData
     {
         public IEnumerable<string> VariableNames;
-        public IEnumerable<IEnumerable<double>> DataSet; 
+        public IEnumerable<double[]> DataSet; 
     }
 }
