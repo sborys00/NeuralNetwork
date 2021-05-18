@@ -31,18 +31,6 @@ namespace NeuralNetwork.Core.Models
             return this;
         }
 
-        public NetworkBuilder SetLearningRate(double lr)
-        {
-            _network.LearningRate = lr;
-            return this;
-        }
-
-        public NetworkBuilder SetActivationFunction(Func<double, double> af)
-        {
-            _network.ActivationFunction = af;
-            return this;
-        }
-
         public Network Build()
         {
             return _network;
