@@ -6,7 +6,7 @@ namespace NeuralNetwork.Core.Models
 {
     public interface ILearningManager
     {
-        Func<double, double> ActivationFunction { get; set; }
+        ActivationFuntion ActivationFunction { get; set; }
         int Epoch { get; }
         double LearningRate { get; set; }
         Network Network { get; set; }

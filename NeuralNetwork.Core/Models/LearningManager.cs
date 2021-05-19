@@ -14,7 +14,7 @@ namespace NeuralNetwork.Core.Models
         /// Should be between 0.0 to 1.0.
         /// </summary>
         public double LearningRate { get; set; }
-        public Func<double, double> ActivationFunction { get; set; }
+        public ActivationFuntion ActivationFunction { get; set; }
         public List<TrainingDataUnit> TrainingSet { get; set; }
         public List<TrainingDataUnit> TestSet { get; set; }
 
@@ -43,7 +43,7 @@ namespace NeuralNetwork.Core.Models
         /// <returns></returns>
         public TestResult RunOneTest(Network network, TrainingDataUnit test)
         {
-            var networkOutput = network.CalculateOutput(test.inputValues, this.ActivationFunction).Last();
+            var networkOutput = network.CalculateOutput(test.inputValues, this.ActivationFunction.Function).Last();
             if (networkOutput.Count != test.expectedOutputs.Length)
                 throw new Exception("Number of outputs does not match test data");
 
