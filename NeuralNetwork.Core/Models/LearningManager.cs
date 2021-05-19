@@ -15,11 +15,16 @@ namespace NeuralNetwork.Core.Models
         /// </summary>
         public double LearningRate { get; set; }
         public Func<double, double> ActivationFunction { get; set; }
-        public List<IEnumerable<double>> TrainingSet { get; set; }
-        public List<IEnumerable<double>> TestSet { get; set; }
+        public List<TrainingDataUnit> TrainingSet { get; set; }
+        public List<TrainingDataUnit> TestSet { get; set; }
 
         public Network Network { get; set; }
 
+        /// <summary>
+        /// Runs all tests in TestSet property
+        /// </summary>
+        /// <param name="network">Instance of Network to be tested</param>
+        /// <returns></returns>
         public List<TestResult> RunAllTests(Network network)
         {
             List<TestResult> results = new();
@@ -30,9 +35,29 @@ namespace NeuralNetwork.Core.Models
             return results;
         }
 
-        public TestResult RunOneTest(Network network, IEnumerable<double> test)
+        /// <summary>
+        /// Runs one test and returns the result as TestResult object.
+        /// </summary>
+        /// <param name="network">Network instance to be tested</param>
+        /// <param name="test">Unit of training data</param>
+        /// <returns></returns>
+        public TestResult RunOneTest(Network network, TrainingDataUnit test)
         {
-            throw new NotImplementedException();
+            var networkOutput = network.CalculateOutput(test.inputValues, this.ActivationFunction).Last();
+            if (networkOutput.Count != test.expectedOutputs.Length)
+                throw new Exception("Number of outputs does not match test data");
+
+            int len = test.expectedOutputs.Length;
+
+            double[] expected = new double[len];
+            double[] actual = new double[len];
+
+            for (int i = 0; i < len; i++)
+            {
+                expected[i] = test.expectedOutputs[i];
+                actual[i] = networkOutput[i];
+            }
+            return new TestResult(expected, actual);
         }
 
         public void TrainForMultipleEpochs(int numberOfEpochs)

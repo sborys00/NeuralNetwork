@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NeuralNetwork.Core.Models;
 
 namespace NeuralNetwork.Core.Models
 {
@@ -9,13 +10,13 @@ namespace NeuralNetwork.Core.Models
         int Epoch { get; }
         double LearningRate { get; set; }
         Network Network { get; set; }
-        List<IEnumerable<double>> TrainingSet { get; set; }
-        List<IEnumerable<double>> TestSet { get; set; }
+        List<TrainingDataUnit> TrainingSet { get; set; }
+        List<TrainingDataUnit> TestSet { get; set; }
 
         void TrainForOneEpoch();
         void TrainForMultipleEpochs(int numberOfEpochs);
 
-        TestResult RunOneTest(Network network, IEnumerable<double> test);
+        TestResult RunOneTest(Network network, TrainingDataUnit test);
         List<TestResult> RunAllTests(Network network);
 
     }

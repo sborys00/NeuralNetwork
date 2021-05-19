@@ -12,12 +12,12 @@ namespace NeuralNetwork.Core.Models
     public class TrainingDataUnit
     {
         public readonly double[] inputValues;
-        public readonly double expectedOutput;
+        public readonly double[] expectedOutputs;
 
-        public TrainingDataUnit(double[] inputValues, double expectedOutput)
+        public TrainingDataUnit(double[] inputValues, double[] expectedOutput)
         {
             this.inputValues = inputValues;
-            this.expectedOutput = expectedOutput;
+            this.expectedOutputs = expectedOutput;
         }
     }
 }

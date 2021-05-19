@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace NeuralNetwork.Core.Models
 {
-    public class TestResult
+    public struct TestResult
     {
+        public readonly double[] expectedValues;
+        public readonly double[] actualValues;
+
+        public TestResult(double[] expectedValues, double[] actualValues)
+        {
+            this.expectedValues = expectedValues;
+            this.actualValues = actualValues;
+        }
     }
 }
