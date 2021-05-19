@@ -26,18 +26,18 @@ namespace NeuralNetwork.Core.Tests
 
             mockFileSystem.AddFile(@"C:\data\input.txt", mockInputFile);
             IFileReader fr = new CSVReader(mockFileSystem);
-            InputData data = await fr.ReadInputData(path);
-            Assert.Equal(1.1, data.DataSet.ElementAt(0).ElementAt(0));
-            Assert.Equal(2.1, data.DataSet.ElementAt(0).ElementAt(1));
-            Assert.Equal(1.0, data.DataSet.ElementAt(0).ElementAt(2));
-
-            Assert.Equal(0.3, data.DataSet.ElementAt(1).ElementAt(0));
-            Assert.Equal(3.2, data.DataSet.ElementAt(1).ElementAt(1));
-            Assert.Equal(3.2, data.DataSet.ElementAt(1).ElementAt(2));
-
-            Assert.Equal(5.3, data.DataSet.ElementAt(2).ElementAt(0));
-            Assert.Equal(1.1, data.DataSet.ElementAt(2).ElementAt(1));
-            Assert.Equal(2.1, data.DataSet.ElementAt(2).ElementAt(2));
+            TrainingDataset data = await fr.ReadInputData(path);
+            Assert.Equal(1.1, data.Dataset.ElementAt(0).inputValues[0]);
+            Assert.Equal(2.1, data.Dataset.ElementAt(0).inputValues[1]);
+            Assert.Equal(1.0, data.Dataset.ElementAt(0).expectedOutput);
+                                       
+            Assert.Equal(0.3, data.Dataset.ElementAt(1).inputValues[0]);
+            Assert.Equal(3.2, data.Dataset.ElementAt(1).inputValues[1]);
+            Assert.Equal(3.2, data.Dataset.ElementAt(1).expectedOutput);
+                                       
+            Assert.Equal(5.3, data.Dataset.ElementAt(2).inputValues[0]);
+            Assert.Equal(1.1, data.Dataset.ElementAt(2).inputValues[1]);
+            Assert.Equal(2.1, data.Dataset.ElementAt(2).expectedOutput);
         }
     }
 }

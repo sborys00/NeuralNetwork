@@ -5,6 +5,6 @@ namespace NeuralNetwork.Core.DataAccess
 {
     public interface IFileReader
     {
-        public Task<InputData> ReadInputData(string path);
+        public Task<TrainingDataset> ReadInputData(string path);
     }
 }

@@ -19,10 +19,10 @@ namespace NeuralNetwork.Core.DataAccess
             _fileSystem = fileSystem;
         }
 
-        public async Task<InputData> ReadInputData(string path)
+        public async Task<TrainingDataset> ReadInputData(string path)
         {
-            InputData inputData = new();
-            List<double[]> data = new();
+            TrainingDataset inputData = new();
+            List<TrainingDataUnit> data = new();
             CultureInfo culture = new("en-US");
             try
             {
@@ -31,20 +31,20 @@ namespace NeuralNetwork.Core.DataAccess
                 {
                     string line = await sr.ReadLineAsync();
                     string[] valuesStr = line.Split(",");
-                    double[] values = new double[valuesStr.Length];
+                    double[] values = new double[valuesStr.Length - 1];
                     for (int i = 0; i < values.Length; i++)
                     {
                         values[i] = Convert.ToDouble(valuesStr[i], culture);
                     }
-                    data.Add(values);
+                    double result = Convert.ToDouble(valuesStr[^1], culture);
+                    data.Add(new TrainingDataUnit(values, result));
                 }
-                
             }
             catch
             {
                 throw;
             }
-            inputData.DataSet = data;
+            inputData.Dataset = data;
             return inputData;
         }
     }
