@@ -8,6 +8,9 @@ namespace NeuralNetwork.Core.Models
 {
     public class Neuron
     {
+        /// <summary>
+        /// Weights of connections from current layer to the next one.
+        /// </summary>
         public List<double> Weights { get; set; } = new();
 
         public static double CalculateOutput(double[] input, double[] enteringWeights)
