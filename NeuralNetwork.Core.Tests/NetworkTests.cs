@@ -241,22 +241,5 @@ namespace NeuralNetwork.Core.Tests
 
             Assert.Throws<Exception>(delegate { network.CalculateOutput(new double[] { 1, 2, 3, 4 }, x => x); });
         }
-        
-        [Fact]
-        public void CalculateErrorForOutputLayer_ShouldReturnCorrectValues()
-        {
-            NetworkBuilder networkBuilder = new();
-
-            Network network = networkBuilder.AddLayers(2, 2).Build();
-            double[] outputs = { 0.6, 0.4, 0.2, 0, 0.1 };
-            double[] targets = { 0.4, 0.2, 0.2, 0.6, 1 };
-            double[] actual = network.CalculateErrorForOutputLayer(outputs, targets);
-            double[] expected = new double[outputs.Length];
-            for (int i = 0; i < expected.Length; i++)
-            {
-                expected[i] = Math.Pow((outputs[i] - targets[i]), 2);
-            }
-            Assert.Equal(expected, actual);
-        }
     }
 }

@@ -10,11 +10,13 @@ namespace NeuralNetwork.Core.Models
     {
         public readonly double[] expectedValues;
         public readonly double[] actualValues;
+        public List<List<double>> networkOutputs;
 
-        public TestResult(double[] expectedValues, double[] actualValues)
+        public TestResult(double[] expectedValues, double[] actualValues, List<List<double>> networkOutputs)
         {
             this.expectedValues = expectedValues;
             this.actualValues = actualValues;
+            this.networkOutputs = networkOutputs;
         }
     }
 }

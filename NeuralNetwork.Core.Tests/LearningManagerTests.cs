@@ -27,5 +27,23 @@ namespace NeuralNetwork.Core.Tests
             Assert.Equal(expectedOutput[0], result.expectedValues[0]);
             Assert.Equal(expectedOutput[1], result.expectedValues[1]);
         }
+
+        [Fact]
+        public void CalculateErrorForOutputLayer_ShouldReturnCorrectValues()
+        {
+            LearningManager lm = new();
+            NetworkBuilder networkBuilder = new();
+
+            Network network = networkBuilder.AddLayers(2, 2).Build();
+            double[] outputs = { 0.6, 0.4, 0.2, 0, 0.1 };
+            double[] targets = { 0.4, 0.2, 0.2, 0.6, 1 };
+            double[] actual = lm.CalculateErrorForOutputLayer(outputs, targets);
+            double[] expected = new double[outputs.Length];
+            for (int i = 0; i < expected.Length; i++)
+            {
+                expected[i] = Math.Pow((outputs[i] - targets[i]), 2);
+            }
+            Assert.Equal(expected, actual);
+        }
     }
 }

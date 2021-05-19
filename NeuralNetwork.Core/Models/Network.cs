@@ -128,19 +128,6 @@ namespace NeuralNetwork.Core.Models
             return inputHistory;
         }
         
-        public double[] CalculateErrorForOutputLayer(double[] output, double[] target)
-        {
-            if (output.Length != target.Length)
-                throw new Exception("Output array does not match size of the target array");
-
-            double[] errors = new double[output.Length];
-            for (int i = 0; i < output.Length; i++)
-            {
-                double diff = output[i] - target[i];
-                errors[i] = diff * diff;
-            }
-            return errors;
-        }
         private void InitializeWeightsForLayer(int index)
         {
             if (index < 0)

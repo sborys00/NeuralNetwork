@@ -28,7 +28,7 @@ namespace NeuralNetwork.Core.Models
         public List<TestResult> RunAllTests(Network network)
         {
             List<TestResult> results = new();
-            foreach(var test in TestSet)
+            foreach (var test in TestSet)
             {
                 results.Add(RunOneTest(network, test));
             }
@@ -43,8 +43,9 @@ namespace NeuralNetwork.Core.Models
         /// <returns></returns>
         public TestResult RunOneTest(Network network, TrainingDataUnit test)
         {
-            var networkOutput = network.CalculateOutput(test.inputValues, this.ActivationFunction.Function).Last();
-            if (networkOutput.Count != test.expectedOutputs.Length)
+            var networkOutputs = network.CalculateOutput(test.inputValues, this.ActivationFunction.Function);
+            var lastLayer = networkOutputs.Last();
+            if (lastLayer.Count != test.expectedOutputs.Length)
                 throw new Exception("Number of outputs does not match test data");
 
             int len = test.expectedOutputs.Length;
@@ -55,9 +56,45 @@ namespace NeuralNetwork.Core.Models
             for (int i = 0; i < len; i++)
             {
                 expected[i] = test.expectedOutputs[i];
-                actual[i] = networkOutput[i];
+                actual[i] = lastLayer[i];
             }
-            return new TestResult(expected, actual);
+            return new TestResult(expected, actual, networkOutputs);
+        }
+
+        public void RunBackPropagation(Network network)
+        {
+            foreach (var test in TrainingSet)
+            {
+                TestResult result = RunOneTest(network, test);
+                double[] errors = CalculateErrorForOutputLayer(result.actualValues, result.expectedValues);
+                double[] errorAndDerivativeProducts = CalculateErrorAndDerivativeProducts(errors, result.actualValues);
+                Layer outputLayer = network.Layers.Last();
+                for (int i = 0; i < outputLayer.Neurons.Count; i++)
+                {
+                    Neuron neuron = outputLayer.Neurons[i];
+                    for (int j = 0; j < neuron.Weights.Count; j++)
+                    {
+                        double deltaWeight = 2 * LearningRate * errorAndDerivativeProducts[i];
+                        //deltaWeight *= result.networkOutputs[^2][i];
+                    }
+                }
+            }
+            //TODO
+
+        }
+
+        public double[] CalculateErrorForOutputLayer(double[] output, double[] target)
+        {
+            if (output.Length != target.Length)
+                throw new Exception("Output array does not match size of the target array");
+
+            double[] errors = new double[output.Length];
+            for (int i = 0; i < output.Length; i++)
+            {
+                double diff = output[i] - target[i];
+                errors[i] = diff * diff;
+            }
+            return errors;
         }
 
         public void TrainForMultipleEpochs(int numberOfEpochs)
@@ -68,6 +105,15 @@ namespace NeuralNetwork.Core.Models
         public void TrainForOneEpoch()
         {
             throw new NotImplementedException();
+        }
+
+        private double[] CalculateErrorAndDerivativeProducts(double[] errors, double[] outputs)
+        {
+            for (int i = 0; i < errors.Length; i++)
+            {
+                errors[i] *= ActivationFunction.Derivative(outputs[i]);
+            }
+            return errors;
         }
     }
 }
