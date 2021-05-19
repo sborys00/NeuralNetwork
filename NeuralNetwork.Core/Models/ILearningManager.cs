@@ -15,5 +15,8 @@ namespace NeuralNetwork.Core.Models
         void TrainForOneEpoch();
         void TrainForMultipleEpochs(int numberOfEpochs);
 
+        TestResult RunOneTest(Network network, IEnumerable<double> test);
+        List<TestResult> RunAllTests(Network network);
+
     }
 }

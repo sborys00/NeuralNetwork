@@ -20,6 +20,21 @@ namespace NeuralNetwork.Core.Models
 
         public Network Network { get; set; }
 
+        public List<TestResult> RunAllTests(Network network)
+        {
+            List<TestResult> results = new();
+            foreach(var test in TestSet)
+            {
+                results.Add(RunOneTest(network, test));
+            }
+            return results;
+        }
+
+        public TestResult RunOneTest(Network network, IEnumerable<double> test)
+        {
+            throw new NotImplementedException();
+        }
+
         public void TrainForMultipleEpochs(int numberOfEpochs)
         {
             throw new NotImplementedException();
