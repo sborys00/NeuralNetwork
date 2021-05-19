@@ -40,5 +40,12 @@ namespace NeuralNetwork.Core.Models
                 }
             }
         }
+        public void UpdateWeights(List<List<double>> newWeights)
+        {
+            for (int i = 0; i < newWeights.Count; i++)
+            {
+                Neurons[i].Weights = newWeights[i];
+            }
+        }
     }
 }
