@@ -5,6 +5,12 @@ namespace NeuralNetwork.Core.DataAccess
 {
     public interface IFileReader
     {
-        public Task<TrainingDataset> ReadInputData(string path);
+        /// <summary>
+        /// Reads all data from file and convert it to TrainingDataset object.
+        /// </summary>
+        /// <param name="path">Path to data file</param>
+        /// <param name="outputIndexes">Indexes of values that are outputs, starting with 0</param>
+        /// <returns></returns>
+        public Task<TrainingDataset> ReadInputData(string path, int[] outputIndexes);
     }
 }

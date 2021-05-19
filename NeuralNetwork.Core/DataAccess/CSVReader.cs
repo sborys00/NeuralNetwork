@@ -19,7 +19,7 @@ namespace NeuralNetwork.Core.DataAccess
             _fileSystem = fileSystem;
         }
 
-        public async Task<TrainingDataset> ReadInputData(string path)
+        public async Task<TrainingDataset> ReadInputData(string path, int[] outputIndexes)
         {
             TrainingDataset inputData = new();
             List<TrainingDataUnit> data = new();
@@ -31,13 +31,20 @@ namespace NeuralNetwork.Core.DataAccess
                 {
                     string line = await sr.ReadLineAsync();
                     string[] valuesStr = line.Split(",");
-                    double[] values = new double[valuesStr.Length - 1];
+                    double[] values = new double[valuesStr.Length];
+                    
+                    List<double> inputs = new();
+                    List<double> outputs = new();
                     for (int i = 0; i < values.Length; i++)
                     {
-                        values[i] = Convert.ToDouble(valuesStr[i], culture);
+                        double value = Convert.ToDouble(valuesStr[i], culture);
+                        if (outputIndexes.Contains(i))
+                            outputs.Add(value);
+                        else
+                            inputs.Add(value);
                     }
-                    double result = Convert.ToDouble(valuesStr[^1], culture);
-                    data.Add(new TrainingDataUnit(values, result));
+
+                    data.Add(new TrainingDataUnit(inputs.ToArray(), outputs.ToArray()));
                 }
             }
             catch
