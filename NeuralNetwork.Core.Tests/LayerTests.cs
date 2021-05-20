@@ -21,7 +21,7 @@ namespace NeuralNetwork.Core.Tests
             network.Layers[1].Neurons.ForEach(n => n.Weights = new List<double>(new double[] { .4, .5, .6, .7, .8 }));
 
             double[] expectedOutput = { 1.6, 3.2, 4.8 };
-            network.Layers[1].CalculateOutputs(new double[] { 5, 6, 2, 3 }, Network.GetWeightsFromLayer(network.Layers[0]), x => x, out double[] actualOutput, out double[,] currentWeights);
+            network.Layers[1].CalculateOutputs(new double[] { 5, 6, 2, 3 }, Network.GetWeightsFromLayer(network.Layers[0]), x => x, out double[] actualOutput, out double[] inputs, out double[,] currentWeights);
 
             Assert.Equal(expectedOutput, actualOutput);
         }

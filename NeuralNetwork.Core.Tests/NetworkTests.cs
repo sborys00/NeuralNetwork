@@ -224,7 +224,7 @@ namespace NeuralNetwork.Core.Tests
              *    1   2   3
              */
 
-            List<List<double>> output = network.CalculateOutput(new double[] { 1, 2, 3 }, x => x);
+            List<List<double>> output = network.CalculateOutput(new double[] { 1, 2, 3 }, x => x).outputs;
 
             Assert.Equal(new double[] { 2.4, 3 }, output.Last().Select(x => Math.Round(x, 2)));
         }

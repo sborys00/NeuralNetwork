@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NeuralNetwork.Core.Models;
+using System;
 using Xunit;
-using NeuralNetwork.Core.Models;
 
 namespace NeuralNetwork.Core.Tests
 {
@@ -41,9 +37,26 @@ namespace NeuralNetwork.Core.Tests
             double[] expected = new double[outputs.Length];
             for (int i = 0; i < expected.Length; i++)
             {
-                expected[i] = Math.Pow((outputs[i] - targets[i]), 2);
+                expected[i] = outputs[i] - targets[i];
             }
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void RunBackpropagation_ShouldCalculateCorrectValues()
+        {
+            int[] neuronAmounts = new int[] { 3, 4, 3 };
+            NetworkBuilder networkBuilder = new();
+
+            Network network = networkBuilder.AddLayers(neuronAmounts).Build();
+            LearningManager learningManager = new();
+            learningManager.LearningRate = 0.1;
+            learningManager.ActivationFunction = new SigmoidActivationFunction();
+            learningManager.TrainingSet = new() { new TrainingDataUnit(
+                new double[] { 0.1, 0.3, 0.5},
+                new double[] { 0.4, 0.2, 0.6}
+            )};
+            learningManager.RunBackPropagation(network);
         }
     }
 }

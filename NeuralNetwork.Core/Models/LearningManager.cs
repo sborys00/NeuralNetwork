@@ -44,7 +44,7 @@ namespace NeuralNetwork.Core.Models
         public TestResult RunOneTest(Network network, TrainingDataUnit test)
         {
             var networkOutputs = network.CalculateOutput(test.inputValues, this.ActivationFunction.Function);
-            var lastLayer = networkOutputs.Last();
+            var lastLayer = networkOutputs.outputs.Last();
             if (lastLayer.Count != test.expectedOutputs.Length)
                 throw new Exception("Number of outputs does not match test data");
 
@@ -58,7 +58,7 @@ namespace NeuralNetwork.Core.Models
                 expected[i] = test.expectedOutputs[i];
                 actual[i] = lastLayer[i];
             }
-            return new TestResult(expected, actual, networkOutputs);
+            return new TestResult(expected, actual, networkOutputs.outputs, networkOutputs.inputs);
         }
 
         public void RunBackPropagation(Network network)
@@ -67,20 +67,22 @@ namespace NeuralNetwork.Core.Models
             {
                 TestResult result = RunOneTest(network, test);
                 double[] errors = CalculateErrorForOutputLayer(result.actualValues, result.expectedValues);
-                double[] errorAndDerivativeProducts = CalculateErrorAndDerivativeProducts(errors, result.actualValues);
+                double[] errorAndDerivativeProducts = CalculateErrorAndDerivativeProducts(errors, result.networkInputs[^1].ToArray());
                 Layer outputLayer = network.Layers.Last();
-                for (int i = 0; i < outputLayer.Neurons.Count; i++)
+                Layer prevLayer = network.Layers[^2];
+                double[][] weightDeltas = new double[prevLayer.Neurons.Count][];
+                //weight delta from i-th neuron to j-th neuron from next layer
+                for (int i = 0; i < prevLayer.Neurons.Count; i++)
                 {
-                    Neuron neuron = outputLayer.Neurons[i];
+                    Neuron neuron = prevLayer.Neurons[i];
+                    weightDeltas[i] = new double[neuron.Weights.Count];
                     for (int j = 0; j < neuron.Weights.Count; j++)
                     {
-                        double deltaWeight = 2 * LearningRate * errorAndDerivativeProducts[i];
-                        //deltaWeight *= result.networkOutputs[^2][i];
+                        weightDeltas[i][j] = 2 * LearningRate * errorAndDerivativeProducts[j];
+                        weightDeltas[i][j] *= result.networkOutputs[^2][i];
                     }
                 }
             }
-            //TODO
-
         }
 
         public double[] CalculateErrorForOutputLayer(double[] output, double[] target)
@@ -92,7 +94,7 @@ namespace NeuralNetwork.Core.Models
             for (int i = 0; i < output.Length; i++)
             {
                 double diff = output[i] - target[i];
-                errors[i] = diff * diff;
+                errors[i] = diff;// * diff;
             }
             return errors;
         }
@@ -107,13 +109,14 @@ namespace NeuralNetwork.Core.Models
             throw new NotImplementedException();
         }
 
-        private double[] CalculateErrorAndDerivativeProducts(double[] errors, double[] outputs)
+        private double[] CalculateErrorAndDerivativeProducts(double[] errors, double[] inputs)
         {
-            for (int i = 0; i < errors.Length; i++)
+            double[] errorsAndDerivative = (double[])errors.Clone();
+            for (int i = 0; i < errorsAndDerivative.Length; i++)
             {
-                errors[i] *= ActivationFunction.Derivative(outputs[i]);
+                errorsAndDerivative[i] *= ActivationFunction.Derivative(inputs[i]);
             }
-            return errors;
+            return errorsAndDerivative;
         }
     }
 }

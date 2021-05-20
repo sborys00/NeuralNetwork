@@ -33,6 +33,7 @@ namespace NeuralNetwork.Core.Models
 
         public Network Build()
         {
+            _network.InitializeWeights();
             return _network;
         }
         

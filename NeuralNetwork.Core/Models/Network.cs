@@ -108,24 +108,25 @@ namespace NeuralNetwork.Core.Models
         /// <param name="input"></param>
         /// <param name="activationFunction"></param>
         /// <returns></returns>
-        public List<List<double>> CalculateOutput(double[] input, Func<double, double> activationFunction)
+        public (List<List<double>> outputs, List<List<double>> inputs) CalculateOutput(double[] input, Func<double, double> activationFunction)
         {
             if (input.Length != Layers[0].Neurons.Count)
                 throw new Exception("Input must contain same amount of nodes as the first layer.");
 
             double[,] previousWeights = GetWeightsFromLayer(Layers[0]);
+            List<List<double>> outputHistory = new();
             List<List<double>> inputHistory = new();
             for (int i = 1; i < Layers.Count; i++)
             {
-                inputHistory.Add(input.ToList());
-
-                Layers[i].CalculateOutputs(input, previousWeights, activationFunction, out double[] output, out double[,] currentWeights);
+                outputHistory.Add(input.ToList());
                 
+                Layers[i].CalculateOutputs(input, previousWeights, activationFunction, out double[] output, out double[] rawOutput, out double[,] currentWeights);
+                inputHistory.Add(rawOutput.ToList());
                 input = output;
                 previousWeights = currentWeights;
             }
-            inputHistory.Add(input.ToList());
-            return inputHistory;
+            outputHistory.Add(input.ToList());
+            return (outputHistory, inputHistory);
         }
         
         private void InitializeWeightsForLayer(int index)

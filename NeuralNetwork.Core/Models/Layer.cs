@@ -11,7 +11,7 @@ namespace NeuralNetwork.Core.Models
         public List<Neuron> Neurons { get; set; } = new();
 
         // to refactor
-        public void CalculateOutputs(double[] input, double[,] previousWeights, Func<double, double> activationFunction, out double[] output, out double[,] currentWeights)
+        public void CalculateOutputs(double[] input, double[,] previousWeights, Func<double, double> activationFunction, out double[] output, out double[] rawOutput, out double[,] currentWeights)
         {
             int nextLayerNeuronCount = 0;
             if (Neurons[0].Weights == null)
@@ -24,11 +24,12 @@ namespace NeuralNetwork.Core.Models
                 currentWeights = new double[Neurons.Count, nextLayerNeuronCount];
             }
             output = new double[Neurons.Count];
+            rawOutput = new double[Neurons.Count];
             for (int i = 0; i < Neurons.Count; i++)
             {
                 var currentNeuronEnteringWeights = Enumerable.Range(0, previousWeights.GetLength(0)).Select(x => previousWeights[x, i]).ToArray();
                 output[i] = Neuron.CalculateOutput(input, currentNeuronEnteringWeights);
-
+                rawOutput[i] = output[i];
                 output[i] = activationFunction(output[i]);
 
                 if (currentWeights != null)
