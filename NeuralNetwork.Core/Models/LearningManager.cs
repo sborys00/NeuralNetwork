@@ -67,22 +67,53 @@ namespace NeuralNetwork.Core.Models
             {
                 TestResult result = RunOneTest(network, test);
                 double[] errors = CalculateErrorForOutputLayer(result.actualValues, result.expectedValues);
-                double[] errorAndDerivativeProducts = CalculateErrorAndDerivativeProducts(errors, result.networkInputs[^1].ToArray());
-                Layer outputLayer = network.Layers.Last();
-                Layer prevLayer = network.Layers[^2];
-                double[][] weightDeltas = new double[prevLayer.Neurons.Count][];
-                //weight delta from i-th neuron to j-th neuron from next layer
-                for (int i = 0; i < prevLayer.Neurons.Count; i++)
+                double[][][] deltas = new double[network.Layers.Count - 1][][];
+                for (int i = network.Layers.Count-2; i >= 0; i--)
                 {
-                    Neuron neuron = prevLayer.Neurons[i];
+                    deltas[i] = CalculateDeltasForLayer(network.Layers[i], errors, result.networkInputs[i].ToArray(), result.networkOutputs[i].ToArray());
+                    errors = CalculateErrorForHiddenLayer(errors, network.Layers[i]);
+                }
+                ;
+                /*double[] errorAndDerivativeProducts = CalculateErrorAndDerivativeProducts(errors, result.networkInputs[^1].ToArray());
+                Layer layer = network.Layers[^2];
+                double[][] weightDeltas = new double[layer.Neurons.Count][];
+                //weight delta from i-th neuron to j-th neuron from next layer
+                for (int i = 0; i < layer.Neurons.Count; i++)
+                {
+                    Neuron neuron = layer.Neurons[i];
                     weightDeltas[i] = new double[neuron.Weights.Count];
                     for (int j = 0; j < neuron.Weights.Count; j++)
                     {
                         weightDeltas[i][j] = 2 * LearningRate * errorAndDerivativeProducts[j];
                         weightDeltas[i][j] *= result.networkOutputs[^2][i];
                     }
+                }*/
+            }
+        }
+        /// <summary>
+        /// Calculates values which will be added to existing weights to improve network accuracy. It uses gradient descent method. 
+        /// </summary>
+        /// <param name="layer">Layer with weights to be adjusted</param>
+        /// <param name="errors">Errors of n+1 layer</param>
+        /// <param name="inputs">Input to neurons of the n+1 layer</param>
+        /// <param name="outputs">Output of neurons of n layer</param>
+        /// <returns>2-D array of double type values</returns>
+        public double[][] CalculateDeltasForLayer(Layer layer, double[] errors, double[] inputs, double[] outputs)
+        {
+            double[] errorAndDerivativeProducts = CalculateErrorAndDerivativeProducts(errors, inputs);
+            double[][] weightDeltas = new double[layer.Neurons.Count][];
+            //weight delta from i-th neuron to j-th neuron from next layer
+            for (int i = 0; i < layer.Neurons.Count; i++)
+            {
+                Neuron neuron = layer.Neurons[i];
+                weightDeltas[i] = new double[neuron.Weights.Count];
+                for (int j = 0; j < neuron.Weights.Count; j++)
+                {
+                    weightDeltas[i][j] = 2 * LearningRate * errorAndDerivativeProducts[j];
+                    weightDeltas[i][j] *= outputs[i];
                 }
             }
+            return weightDeltas;
         }
 
         public double[] CalculateErrorForOutputLayer(double[] output, double[] target)
@@ -98,6 +129,20 @@ namespace NeuralNetwork.Core.Models
             }
             return errors;
         }
+        public double[] CalculateErrorForHiddenLayer(double[] prevLayerError, Layer layer)
+        {
+            double[] errors = new double[layer.Neurons.Count];
+            for (int i = 0; i < layer.Neurons.Count; i++)
+            {
+                Neuron neuron = layer.Neurons[i];
+                for (int j = 0; j < neuron.Weights.Count; j++)
+                {
+                    errors[i] += prevLayerError[j] * neuron.Weights[j];
+                }
+            }
+            return errors;
+        }
+
 
         public void TrainForMultipleEpochs(int numberOfEpochs)
         {
