@@ -61,7 +61,7 @@ namespace NeuralNetwork.Core.Models
             return new TestResult(expected, actual, networkOutputs.outputs, networkOutputs.inputs);
         }
 
-        public void RunBackPropagation(Network network)
+        public double RunBackPropagation(Network network)
         {
             double[][][] avgDeltas = new double[network.Layers.Count - 1][][];
             for (int i = 0; i < network.Layers.Count - 1; i++)
@@ -73,11 +73,12 @@ namespace NeuralNetwork.Core.Models
                     avgDeltas[i][j] = new double[neurons[j].Weights.Count];
                 }
             }
-
+            List<double> avgErrors = new();
             foreach (var test in TrainingSet)
             {
                 TestResult result = RunOneTest(network, test);
                 double[] errors = CalculateErrorForOutputLayer(result.actualValues, result.expectedValues);
+                avgErrors.Add(errors.Average(x => Math.Abs(x)));
                 double[][][] deltas = new double[network.Layers.Count - 1][][];
                 for (int i = network.Layers.Count-2; i >= 0; i--)
                 {
@@ -85,57 +86,16 @@ namespace NeuralNetwork.Core.Models
                     errors = CalculateErrorForHiddenLayer(errors, network.Layers[i]);
                 }
                 avgDeltas = AddToDeltaMatrix(avgDeltas, deltas);               
-                /*double[] errorAndDerivativeProducts = CalculateErrorAndDerivativeProducts(errors, result.networkInputs[^1].ToArray());
-                Layer layer = network.Layers[^2];
-                double[][] weightDeltas = new double[layer.Neurons.Count][];
-                //weight delta from i-th neuron to j-th neuron from next layer
-                for (int i = 0; i < layer.Neurons.Count; i++)
-                {
-                    Neuron neuron = layer.Neurons[i];
-                    weightDeltas[i] = new double[neuron.Weights.Count];
-                    for (int j = 0; j < neuron.Weights.Count; j++)
-                    {
-                        weightDeltas[i][j] = 2 * LearningRate * errorAndDerivativeProducts[j];
-                        weightDeltas[i][j] *= result.networkOutputs[^2][i];
-                    }
-                }*/
             }
             avgDeltas = CalculateAvgDeltaMatrix(avgDeltas, TrainingSet.Count);
             for (int i = 0; i < network.Layers.Count - 1; i++)
             {
-                network.Layers[i].UpdateWeights(avgDeltas[i]);
+                network.Layers[i].AddDeltaWeights(avgDeltas[i]);
             }
             Epoch++;
+            return avgErrors.Average();
         }
 
-        private double[][][] AddToDeltaMatrix(double[][][] matrix, double[][][] partialMatrix)
-        {
-            for (int i = 0; i < matrix.Length; i++)
-            {
-                for (int j = 0; j < matrix[i].Length; j++)
-                {
-                    for (int k = 0; k < matrix[i][j].Length; k++)
-                    {
-                        matrix[i][j][k] += partialMatrix[i][j][k];
-                    }
-                }
-            }
-            return matrix;
-        }
-        private double[][][] CalculateAvgDeltaMatrix(double[][][] matrix, int count)
-        {
-            for (int i = 0; i < matrix.Length; i++)
-            {
-                for (int j = 0; j < matrix[i].Length; j++)
-                {
-                    for (int k = 0; k < matrix[i][j].Length; k++)
-                    {
-                        matrix[i][j][k] /= count;
-                    }
-                }
-            }
-            return matrix;
-        }
         /// <summary>
         /// Calculates values which will be added to existing weights to improve network accuracy. It uses gradient descent method. 
         /// </summary>
@@ -155,7 +115,7 @@ namespace NeuralNetwork.Core.Models
                 weightDeltas[i] = new double[neuron.Weights.Count];
                 for (int j = 0; j < neuron.Weights.Count; j++)
                 {
-                    weightDeltas[i][j] = 2 * LearningRate * errorAndDerivativeProducts[j];
+                    weightDeltas[i][j] = -2 * LearningRate * errorAndDerivativeProducts[j];
                     weightDeltas[i][j] *= outputs[i];
                 }
             }
@@ -208,6 +168,34 @@ namespace NeuralNetwork.Core.Models
                 errorsAndDerivative[i] *= ActivationFunction.Derivative(inputs[i]);
             }
             return errorsAndDerivative;
+        }
+        private double[][][] AddToDeltaMatrix(double[][][] matrix, double[][][] partialMatrix)
+        {
+            for (int i = 0; i < matrix.Length; i++)
+            {
+                for (int j = 0; j < matrix[i].Length; j++)
+                {
+                    for (int k = 0; k < matrix[i][j].Length; k++)
+                    {
+                        matrix[i][j][k] += partialMatrix[i][j][k];
+                    }
+                }
+            }
+            return matrix;
+        }
+        private double[][][] CalculateAvgDeltaMatrix(double[][][] matrix, int count)
+        {
+            for (int i = 0; i < matrix.Length; i++)
+            {
+                for (int j = 0; j < matrix[i].Length; j++)
+                {
+                    for (int k = 0; k < matrix[i][j].Length; k++)
+                    {
+                        matrix[i][j][k] /= count;
+                    }
+                }
+            }
+            return matrix;
         }
     }
 }

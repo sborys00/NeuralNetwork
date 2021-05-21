@@ -48,5 +48,15 @@ namespace NeuralNetwork.Core.Models
                 Neurons[i].Weights = newWeights[i].ToList();
             }
         }
+        public void AddDeltaWeights(double[][] deltas)
+        {
+            for (int i = 0; i < deltas.Length; i++)
+            {
+                for (int j = 0; j < deltas[i].Length; j++)
+                {
+                    Neurons[i].Weights[j] += deltas[i][j];
+                }
+            }
+        }
     }
 }

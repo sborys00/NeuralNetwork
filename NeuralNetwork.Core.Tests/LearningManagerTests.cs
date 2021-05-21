@@ -43,20 +43,59 @@ namespace NeuralNetwork.Core.Tests
         }
 
         [Fact]
-        public void RunBackpropagation_ShouldCalculateCorrectValues()
+        public void RunBackpropagation_ShouldImproveNetworkAccuracy()
         {
             int[] neuronAmounts = new int[] { 3, 4, 3 };
             NetworkBuilder networkBuilder = new();
 
             Network network = networkBuilder.AddLayers(neuronAmounts).Build();
             LearningManager learningManager = new();
-            learningManager.LearningRate = 0.1;
+            learningManager.LearningRate = 0.3;
             learningManager.ActivationFunction = new SigmoidActivationFunction();
-            learningManager.TrainingSet = new() { new TrainingDataUnit(
-                new double[] { 0.1, 0.3, 0.5},
-                new double[] { 0.4, 0.2, 0.6}
-            )};
-            learningManager.RunBackPropagation(network);
+            learningManager.TrainingSet = new() { 
+                new TrainingDataUnit(
+                    new double[] { 1.0, 0.3, 0.4},
+                    new double[] { 1.0, 0.0, 0.0}
+                    ),
+                new TrainingDataUnit(
+                    new double[] { 0.2, 0.9, 0.1 },
+                    new double[] { 0.0, 1.0, 0.0 }
+                    ),
+                new TrainingDataUnit(
+                    new double[] { 0.0, 0.0, 0.7 },
+                    new double[] { 0.0, 0.0, 1.0 }
+                    ),
+                new TrainingDataUnit(
+                    new double[] { 1.0, 0.0, 0.0 },
+                    new double[] { 1.0, 0.0, 0.0 }
+                    ),
+                new TrainingDataUnit(
+                    new double[] { 0.0, 1.0, 0.0 },
+                    new double[] { 0.0, 1.0, 0.0 }
+                    ),
+                new TrainingDataUnit(
+                    new double[] { 0.0, 0.0, 1.0 },
+                    new double[] { 0.0, 0.0, 1.0 }
+                    ),
+                new TrainingDataUnit(
+                    new double[] { 0.0, 0.5, 0.0 },
+                    new double[] { 0.0, 1.0, 0.0 }
+                    ),
+                new TrainingDataUnit(
+                    new double[] { 0.0, 0.0, 0.8 },
+                    new double[] { 0.0, 0.0, 1.0 }
+                    ),
+            };
+            double avgError = 1;
+            for (int i = 0; i < 5; i++)
+            {
+                double oldAvgError = avgError;
+                for (int j = 0; j < 5; j++)
+                {
+                    avgError = learningManager.RunBackPropagation(network);
+                }
+                    Assert.True(avgError < oldAvgError);
+            }
         }
     }
 }
