@@ -41,11 +41,11 @@ namespace NeuralNetwork.Core.Models
                 }
             }
         }
-        public void UpdateWeights(List<List<double>> newWeights)
+        public void UpdateWeights(double[][] newWeights)
         {
-            for (int i = 0; i < newWeights.Count; i++)
+            for (int i = 0; i < newWeights.Length; i++)
             {
-                Neurons[i].Weights = newWeights[i];
+                Neurons[i].Weights = newWeights[i].ToList();
             }
         }
     }

@@ -35,10 +35,10 @@ namespace NeuralNetwork.Core.Tests
             layer.Neurons.Add(new Neuron());
             layer.Neurons.Add(new Neuron());
 
-            List<List<double>> newWeights = new() {
-                new List<double>() { 0.2, 0.3, 0.4 },
-                new List<double>() { 0.5, 1.0, 0.1},
-                new List<double>() { 0.6, 0.2, 0.3},
+            double[][] newWeights = new double[][] {
+                new double[] { 0.2, 0.3, 0.4},
+                new double[] { 0.5, 1.0, 0.1},
+                new double[] { 0.6, 0.2, 0.3},
             };
             layer.UpdateWeights(newWeights);
 

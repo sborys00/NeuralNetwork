@@ -8,7 +8,7 @@ namespace NeuralNetwork.Core.Models
 {
     public class LearningManager : ILearningManager
     {
-        public int Epoch { get; }
+        public int Epoch { get; set; }
 
         /// <summary>
         /// Should be between 0.0 to 1.0.
@@ -63,6 +63,17 @@ namespace NeuralNetwork.Core.Models
 
         public void RunBackPropagation(Network network)
         {
+            double[][][] avgDeltas = new double[network.Layers.Count - 1][][];
+            for (int i = 0; i < network.Layers.Count - 1; i++)
+            {
+                List<Neuron> neurons = network.Layers[i].Neurons;
+                avgDeltas[i] = new double[neurons.Count][];
+                for (int j = 0; j < neurons.Count; j++)
+                {
+                    avgDeltas[i][j] = new double[neurons[j].Weights.Count];
+                }
+            }
+
             foreach (var test in TrainingSet)
             {
                 TestResult result = RunOneTest(network, test);
@@ -73,7 +84,7 @@ namespace NeuralNetwork.Core.Models
                     deltas[i] = CalculateDeltasForLayer(network.Layers[i], errors, result.networkInputs[i].ToArray(), result.networkOutputs[i].ToArray());
                     errors = CalculateErrorForHiddenLayer(errors, network.Layers[i]);
                 }
-                ;
+                avgDeltas = AddToDeltaMatrix(avgDeltas, deltas);               
                 /*double[] errorAndDerivativeProducts = CalculateErrorAndDerivativeProducts(errors, result.networkInputs[^1].ToArray());
                 Layer layer = network.Layers[^2];
                 double[][] weightDeltas = new double[layer.Neurons.Count][];
@@ -89,6 +100,41 @@ namespace NeuralNetwork.Core.Models
                     }
                 }*/
             }
+            avgDeltas = CalculateAvgDeltaMatrix(avgDeltas, TrainingSet.Count);
+            for (int i = 0; i < network.Layers.Count - 1; i++)
+            {
+                network.Layers[i].UpdateWeights(avgDeltas[i]);
+            }
+            Epoch++;
+        }
+
+        private double[][][] AddToDeltaMatrix(double[][][] matrix, double[][][] partialMatrix)
+        {
+            for (int i = 0; i < matrix.Length; i++)
+            {
+                for (int j = 0; j < matrix[i].Length; j++)
+                {
+                    for (int k = 0; k < matrix[i][j].Length; k++)
+                    {
+                        matrix[i][j][k] += partialMatrix[i][j][k];
+                    }
+                }
+            }
+            return matrix;
+        }
+        private double[][][] CalculateAvgDeltaMatrix(double[][][] matrix, int count)
+        {
+            for (int i = 0; i < matrix.Length; i++)
+            {
+                for (int j = 0; j < matrix[i].Length; j++)
+                {
+                    for (int k = 0; k < matrix[i][j].Length; k++)
+                    {
+                        matrix[i][j][k] /= count;
+                    }
+                }
+            }
+            return matrix;
         }
         /// <summary>
         /// Calculates values which will be added to existing weights to improve network accuracy. It uses gradient descent method. 
