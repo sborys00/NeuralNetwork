@@ -5,18 +5,40 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NeuralNetwork.UI"
         mc:Ignorable="d"
-        Title="Neural Network" Height="446" Width="800">
+        Title="Neural Network" Height="446" Width="800"
+        Background="#FF2A2A8B">
+    
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="30"
+            CornerRadius="0"
+            GlassFrameThickness="0"
+            NonClientFrameEdges="None"
+            ResizeBorderThickness="5"
+            UseAeroCaptionButtons="False">
+        </WindowChrome>
+    </WindowChrome.WindowChrome>
+    <Window.Resources>
+        <Style TargetType="{x:Type Panel}" x:Key="WindowMainPanelStyle">
+            <Setter Property="Margin" Value="0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=WindowState}" Value="Maximized">
+                    <Setter Property="Margin" Value="7" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="97.5"/>
-            <ColumnDefinition Width="22.5"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="100"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="10"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
@@ -25,10 +47,12 @@
             <RowDefinition Height="10"/>
         </Grid.RowDefinitions>
 
-        <Rectangle Grid.Column="0" Grid.RowSpan="7" Fill="#FF666666" Grid.ColumnSpan="2">
+        <Rectangle Grid.Column="0" Grid.RowSpan="100" Fill="#FF2B2B2B" Grid.ColumnSpan="2">
             <Rectangle.Effect>
-                <DropShadowEffect Direction="15" BlurRadius="7" Opacity="0.5" ShadowDepth="2" RenderingBias="Performance"/>
+                <DropShadowEffect Direction="0" BlurRadius="7" Opacity="0.5" ShadowDepth="2" RenderingBias="Performance"/>
             </Rectangle.Effect>
+        </Rectangle>
+        <Rectangle Grid.Row="0" Grid.ColumnSpan="100" Fill="#FF1F1F1F">
         </Rectangle>
     </Grid>
 </Window>
