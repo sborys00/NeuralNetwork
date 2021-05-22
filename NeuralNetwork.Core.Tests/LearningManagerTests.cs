@@ -37,7 +37,7 @@ namespace NeuralNetwork.Core.Tests
             double[] expected = new double[outputs.Length];
             for (int i = 0; i < expected.Length; i++)
             {
-                expected[i] = outputs[i] - targets[i];
+                expected[i] = targets[i] - outputs[i];
             }
             Assert.Equal(expected, actual);
         }
@@ -94,7 +94,7 @@ namespace NeuralNetwork.Core.Tests
                 {
                     avgError = learningManager.RunBackPropagation(network);
                 }
-                    Assert.True(avgError < oldAvgError);
+                Assert.True(avgError < oldAvgError);
             }
         }
     }

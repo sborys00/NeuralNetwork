@@ -78,7 +78,7 @@ namespace NeuralNetwork.Core.Models
             {
                 TestResult result = RunOneTest(network, test);
                 double[] errors = CalculateErrorForOutputLayer(result.actualValues, result.expectedValues);
-                avgErrors.Add(errors.Average(x => Math.Abs(x)));
+                avgErrors.Add(errors.Average(e => e * e));
                 double[][][] deltas = new double[network.Layers.Count - 1][][];
                 for (int i = network.Layers.Count-2; i >= 0; i--)
                 {
@@ -115,7 +115,7 @@ namespace NeuralNetwork.Core.Models
                 weightDeltas[i] = new double[neuron.Weights.Count];
                 for (int j = 0; j < neuron.Weights.Count; j++)
                 {
-                    weightDeltas[i][j] = -2 * LearningRate * errorAndDerivativeProducts[j];
+                    weightDeltas[i][j] = 2 * LearningRate * errorAndDerivativeProducts[j];
                     weightDeltas[i][j] *= outputs[i];
                 }
             }
@@ -130,8 +130,8 @@ namespace NeuralNetwork.Core.Models
             double[] errors = new double[output.Length];
             for (int i = 0; i < output.Length; i++)
             {
-                double diff = output[i] - target[i];
-                errors[i] = diff;// * diff;
+                double diff = target[i] - output[i];
+                errors[i] = diff;
             }
             return errors;
         }
