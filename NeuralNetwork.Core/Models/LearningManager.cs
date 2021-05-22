@@ -150,14 +150,21 @@ namespace NeuralNetwork.Core.Models
         }
 
 
-        public void TrainForMultipleEpochs(int numberOfEpochs)
+        public void TrainForMultipleEpochs(Network network, int numberOfEpochs)
         {
             throw new NotImplementedException();
         }
 
-        public void TrainForOneEpoch()
+        public void TrainForOneEpoch(Network network)
         {
-            throw new NotImplementedException();
+            double trainingError = RunBackPropagation(network);
+            List<TestResult> testResults = RunAllTests(network);
+            double[] testErrors = new double[testResults.Count];
+            for (int i = 0; i < testResults.Count; i++)
+            {
+                testErrors[i] = CalculateErrorForOutputLayer(testResults[i].actualValues, testResults[i].expectedValues).Average(e => e * e);
+            }
+            double testError = testErrors.Average();
         }
 
         private double[] CalculateErrorAndDerivativeProducts(double[] errors, double[] inputs)

@@ -13,8 +13,8 @@ namespace NeuralNetwork.Core.Models
         List<TrainingDataUnit> TrainingSet { get; set; }
         List<TrainingDataUnit> TestSet { get; set; }
 
-        void TrainForOneEpoch();
-        void TrainForMultipleEpochs(int numberOfEpochs);
+        void TrainForOneEpoch(Network network);
+        void TrainForMultipleEpochs(Network network, int numberOfEpochs);
 
         TestResult RunOneTest(Network network, TrainingDataUnit test);
         List<TestResult> RunAllTests(Network network);
