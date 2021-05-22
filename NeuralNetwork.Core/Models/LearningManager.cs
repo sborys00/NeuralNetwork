@@ -63,16 +63,17 @@ namespace NeuralNetwork.Core.Models
 
         public double RunBackPropagation(Network network)
         {
-            double[][][] avgDeltas = new double[network.Layers.Count - 1][][];
+            double[][][] deltaSum = new double[network.Layers.Count - 1][][];
             for (int i = 0; i < network.Layers.Count - 1; i++)
             {
                 List<Neuron> neurons = network.Layers[i].Neurons;
-                avgDeltas[i] = new double[neurons.Count][];
+                deltaSum[i] = new double[neurons.Count][];
                 for (int j = 0; j < neurons.Count; j++)
                 {
-                    avgDeltas[i][j] = new double[neurons[j].Weights.Count];
+                    deltaSum[i][j] = new double[neurons[j].Weights.Count];
                 }
             }
+
             List<double> avgErrors = new();
             foreach (var test in TrainingSet)
             {
@@ -85,12 +86,12 @@ namespace NeuralNetwork.Core.Models
                     deltas[i] = CalculateDeltasForLayer(network.Layers[i], errors, result.networkInputs[i].ToArray(), result.networkOutputs[i].ToArray());
                     errors = CalculateErrorForHiddenLayer(errors, network.Layers[i]);
                 }
-                avgDeltas = AddToDeltaMatrix(avgDeltas, deltas);               
+                deltaSum = AddDeltasToSumArray(deltaSum, deltas);               
             }
-            avgDeltas = CalculateAvgDeltaMatrix(avgDeltas, TrainingSet.Count);
+            deltaSum = CalculateAvgDeltas(deltaSum, TrainingSet.Count);
             for (int i = 0; i < network.Layers.Count - 1; i++)
             {
-                network.Layers[i].AddDeltaWeights(avgDeltas[i]);
+                network.Layers[i].AddDeltaWeights(deltaSum[i]);
             }
             Epoch++;
             return avgErrors.Average();
@@ -121,40 +122,12 @@ namespace NeuralNetwork.Core.Models
             }
             return weightDeltas;
         }
-
-        public double[] CalculateErrorForOutputLayer(double[] output, double[] target)
-        {
-            if (output.Length != target.Length)
-                throw new Exception("Output array does not match size of the target array");
-
-            double[] errors = new double[output.Length];
-            for (int i = 0; i < output.Length; i++)
-            {
-                double diff = target[i] - output[i];
-                errors[i] = diff;
-            }
-            return errors;
-        }
-        public double[] CalculateErrorForHiddenLayer(double[] prevLayerError, Layer layer)
-        {
-            double[] errors = new double[layer.Neurons.Count];
-            for (int i = 0; i < layer.Neurons.Count; i++)
-            {
-                Neuron neuron = layer.Neurons[i];
-                for (int j = 0; j < neuron.Weights.Count; j++)
-                {
-                    errors[i] += prevLayerError[j] * neuron.Weights[j];
-                }
-            }
-            return errors;
-        }
-
-
+        
         public void TrainForMultipleEpochs(Network network, int numberOfEpochs)
         {
             throw new NotImplementedException();
         }
-
+        
         public void TrainForOneEpoch(Network network)
         {
             double trainingError = RunBackPropagation(network);
@@ -167,42 +140,103 @@ namespace NeuralNetwork.Core.Models
             double testError = testErrors.Average();
         }
 
-        private double[] CalculateErrorAndDerivativeProducts(double[] errors, double[] inputs)
+        /// <summary>
+        /// Calculates error values for the last layer of the network
+        /// </summary>
+        /// <param name="neuronOutputs">Output values of the final layer</param>
+        /// <param name="expectedValues">Expected values specified in the training example</param>
+        /// <returns>New array with errors of output layer</returns>
+        public double[] CalculateErrorForOutputLayer(double[] neuronOutputs, double[] expectedValues)
         {
-            double[] errorsAndDerivative = (double[])errors.Clone();
-            for (int i = 0; i < errorsAndDerivative.Length; i++)
+            if (neuronOutputs.Length != expectedValues.Length)
+                throw new Exception("Output array does not match size of the target array");
+
+            double[] errors = new double[neuronOutputs.Length];
+            for (int i = 0; i < neuronOutputs.Length; i++)
             {
-                errorsAndDerivative[i] *= ActivationFunction.Derivative(inputs[i]);
+                double diff = expectedValues[i] - neuronOutputs[i];
+                errors[i] = diff;
             }
-            return errorsAndDerivative;
+            return errors;
         }
-        private double[][][] AddToDeltaMatrix(double[][][] matrix, double[][][] partialMatrix)
+
+        /// <summary>
+        /// Calculates error values for a hidden layer of the network based on errors from previous layer (counting from the end)
+        /// </summary>
+        /// <param name="prevLayerErrors">Errors of the n+1 layer</param>
+        /// <param name="layer">N-th layer in the network</param>
+        /// <returns>Array of errors of passed layer</returns>
+        public double[] CalculateErrorForHiddenLayer(double[] prevLayerErrors, Layer layer)
         {
-            for (int i = 0; i < matrix.Length; i++)
+            double[] errors = new double[layer.Neurons.Count];
+            for (int i = 0; i < layer.Neurons.Count; i++)
             {
-                for (int j = 0; j < matrix[i].Length; j++)
+                Neuron neuron = layer.Neurons[i];
+                for (int j = 0; j < neuron.Weights.Count; j++)
                 {
-                    for (int k = 0; k < matrix[i][j].Length; k++)
+                    errors[i] += prevLayerErrors[j] * neuron.Weights[j];
+                }
+            }
+            return errors;
+        }
+
+        /// <summary>
+        /// Calculates the result of multiplicating error with derivative of activation function
+        /// </summary>
+        /// <param name="errors">Array of errors from one layer</param>
+        /// <param name="neuronInputs">Array of inputs to neurons from corresponding layer</param>
+        /// <returns>New array with multiplied values</returns>
+        private double[] CalculateErrorAndDerivativeProducts(double[] errors, double[] neuronInputs)
+        {
+            double[] errorAndDerivativeProducts = (double[])errors.Clone();
+            for (int i = 0; i < errorAndDerivativeProducts.Length; i++)
+            {
+                errorAndDerivativeProducts[i] *= ActivationFunction.Derivative(neuronInputs[i]);
+            }
+            return errorAndDerivativeProducts;
+        }
+
+        /// <summary>
+        /// Used to add delta values of entire network from one array to another. It modifies the array passed as first parameter.
+        /// </summary>
+        /// <param name="sumArray">Array which will be altered</param>
+        /// <param name="partialArray">Array with delta values to be added</param>
+        /// <returns>Reference to the same array passed as first parameter</returns>
+        private double[][][] AddDeltasToSumArray(double[][][] sumArray, double[][][] partialArray)
+        {
+            for (int i = 0; i < sumArray.Length; i++)
+            {
+                for (int j = 0; j < sumArray[i].Length; j++)
+                {
+                    for (int k = 0; k < sumArray[i][j].Length; k++)
                     {
-                        matrix[i][j][k] += partialMatrix[i][j][k];
+                        sumArray[i][j][k] += partialArray[i][j][k];
                     }
                 }
             }
-            return matrix;
+            return sumArray;
         }
-        private double[][][] CalculateAvgDeltaMatrix(double[][][] matrix, int count)
+
+        /// <summary>
+        /// Divides all values in array by the passed value. Used to tranform array of summed up deltas for entire epoch to array of avg deltas.
+        /// It modifies the passed array.
+        /// </summary>
+        /// <param name="deltaSum">Array of summed up delta values which will be altered</param>
+        /// <param name="divisor">Value used to divide the delta sum, should be equal to number of partial deltas in the sum.</param>
+        /// <returns></returns>
+        private double[][][] CalculateAvgDeltas(double[][][] deltaSum, int divisor)
         {
-            for (int i = 0; i < matrix.Length; i++)
+            for (int i = 0; i < deltaSum.Length; i++)
             {
-                for (int j = 0; j < matrix[i].Length; j++)
+                for (int j = 0; j < deltaSum[i].Length; j++)
                 {
-                    for (int k = 0; k < matrix[i][j].Length; k++)
+                    for (int k = 0; k < deltaSum[i][j].Length; k++)
                     {
-                        matrix[i][j][k] /= count;
+                        deltaSum[i][j][k] /= divisor;
                     }
                 }
             }
-            return matrix;
+            return deltaSum;
         }
     }
 }
