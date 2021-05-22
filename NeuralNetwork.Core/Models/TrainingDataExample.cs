@@ -9,12 +9,12 @@ namespace NeuralNetwork.Core.Models
     /// <summary>
     /// Stores input values and expected output of a network for training purpose. 
     /// </summary>
-    public class TrainingDataUnit
+    public class TrainingDataExample
     {
         public readonly double[] inputValues;
         public readonly double[] expectedOutputs;
 
-        public TrainingDataUnit(double[] inputValues, double[] expectedOutput)
+        public TrainingDataExample(double[] inputValues, double[] expectedOutput)
         {
             this.inputValues = inputValues;
             this.expectedOutputs = expectedOutput;

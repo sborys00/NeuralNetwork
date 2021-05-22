@@ -10,14 +10,14 @@ namespace NeuralNetwork.Core.Models
         int Epoch { get; }
         double LearningRate { get; set; }
         Network Network { get; set; }
-        List<TrainingDataUnit> TrainingSet { get; set; }
-        List<TrainingDataUnit> TestSet { get; set; }
+        List<TrainingDataExample> TrainingSet { get; set; }
+        List<TrainingDataExample> TestSet { get; set; }
 
-        void TrainForOneEpoch(Network network);
-        void TrainForMultipleEpochs(Network network, int numberOfEpochs);
+        TrainingResult TrainForOneEpoch(Network network);
+        TrainingResult[] TrainForMultipleEpochs(Network network, int numberOfEpochs);
 
-        TestResult RunOneTest(Network network, TrainingDataUnit test);
-        List<TestResult> RunAllTests(Network network);
+        TestResult RunOneExample(Network network, TrainingDataExample test);
+        List<TestResult> RunAllExamples(Network network, List<TrainingDataExample> examples);
 
     }
 }

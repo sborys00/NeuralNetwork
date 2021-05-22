@@ -15,8 +15,8 @@ namespace NeuralNetwork.Core.Models
         /// </summary>
         public double LearningRate { get; set; }
         public ActivationFuntion ActivationFunction { get; set; }
-        public List<TrainingDataUnit> TrainingSet { get; set; }
-        public List<TrainingDataUnit> TestSet { get; set; }
+        public List<TrainingDataExample> TrainingSet { get; set; }
+        public List<TrainingDataExample> TestSet { get; set; }
 
         public Network Network { get; set; }
 
@@ -25,12 +25,12 @@ namespace NeuralNetwork.Core.Models
         /// </summary>
         /// <param name="network">Instance of Network to be tested</param>
         /// <returns></returns>
-        public List<TestResult> RunAllTests(Network network)
+        public List<TestResult> RunAllExamples(Network network, List<TrainingDataExample> examples)
         {
             List<TestResult> results = new();
-            foreach (var test in TestSet)
+            foreach (var test in examples)
             {
-                results.Add(RunOneTest(network, test));
+                results.Add(RunOneExample(network, test));
             }
             return results;
         }
@@ -39,29 +39,29 @@ namespace NeuralNetwork.Core.Models
         /// Runs one test and returns the result as TestResult object.
         /// </summary>
         /// <param name="network">Network instance to be tested</param>
-        /// <param name="test">Unit of training data</param>
+        /// <param name="example">Unit of training data</param>
         /// <returns></returns>
-        public TestResult RunOneTest(Network network, TrainingDataUnit test)
+        public TestResult RunOneExample(Network network, TrainingDataExample example)
         {
-            var networkOutputs = network.CalculateOutput(test.inputValues, this.ActivationFunction.Function);
-            var lastLayer = networkOutputs.outputs.Last();
-            if (lastLayer.Count != test.expectedOutputs.Length)
-                throw new Exception("Number of outputs does not match test data");
+            var (outputs, inputs) = network.CalculateOutput(example.inputValues, this.ActivationFunction.Function);
+            var lastLayer = outputs.Last();
+            if (lastLayer.Count != example.expectedOutputs.Length)
+                throw new Exception("Number of outputs does not match example data");
 
-            int len = test.expectedOutputs.Length;
+            int len = example.expectedOutputs.Length;
 
             double[] expected = new double[len];
             double[] actual = new double[len];
 
             for (int i = 0; i < len; i++)
             {
-                expected[i] = test.expectedOutputs[i];
+                expected[i] = example.expectedOutputs[i];
                 actual[i] = lastLayer[i];
             }
-            return new TestResult(expected, actual, networkOutputs.outputs, networkOutputs.inputs);
+            return new TestResult(expected, actual, outputs, inputs);
         }
 
-        public double RunBackPropagation(Network network)
+        public double RunBackPropagation(Network network, TestResult[] trainingDataResults)
         {
             double[][][] deltaSum = new double[network.Layers.Count - 1][][];
             for (int i = 0; i < network.Layers.Count - 1; i++)
@@ -75,9 +75,8 @@ namespace NeuralNetwork.Core.Models
             }
 
             List<double> avgErrors = new();
-            foreach (var test in TrainingSet)
+            foreach (TestResult result in trainingDataResults)
             {
-                TestResult result = RunOneTest(network, test);
                 double[] errors = CalculateErrorForOutputLayer(result.actualValues, result.expectedValues);
                 avgErrors.Add(errors.Average(e => e * e));
                 double[][][] deltas = new double[network.Layers.Count - 1][][];
@@ -123,21 +122,33 @@ namespace NeuralNetwork.Core.Models
             return weightDeltas;
         }
         
-        public void TrainForMultipleEpochs(Network network, int numberOfEpochs)
+        public TrainingResult[] TrainForMultipleEpochs(Network network, int numberOfEpochs)
         {
-            throw new NotImplementedException();
+            TrainingResult[] results = new TrainingResult[numberOfEpochs];
+            for (int i = 0; i < numberOfEpochs; i++)
+            {
+                results[i] = TrainForOneEpoch(network);
+            }
+            return results;
         }
         
-        public void TrainForOneEpoch(Network network)
+        public TrainingResult TrainForOneEpoch(Network network)
         {
-            double trainingError = RunBackPropagation(network);
-            List<TestResult> testResults = RunAllTests(network);
-            double[] testErrors = new double[testResults.Count];
-            for (int i = 0; i < testResults.Count; i++)
+            TestResult[] trainingResults = RunAllExamples(network, this.TrainingSet).ToArray();
+            TestResult[] testResults = RunAllExamples(network, this.TestSet).ToArray();
+            double trainingError = RunBackPropagation(network, trainingResults.ToArray());
+            double[] testErrors = new double[testResults.Length];
+            for (int i = 0; i < testResults.Length; i++)
             {
                 testErrors[i] = CalculateErrorForOutputLayer(testResults[i].actualValues, testResults[i].expectedValues).Average(e => e * e);
             }
             double testError = testErrors.Average();
+            return new TrainingResult { 
+                TrainingExampleTotalError = trainingError,
+                TestExampleTotalError = testError,
+                trainingResults = trainingResults,
+                testingResults = testResults
+            };
         }
 
         /// <summary>

@@ -22,7 +22,7 @@ namespace NeuralNetwork.Core.DataAccess
         public async Task<TrainingDataset> ReadInputData(string path, int[] outputIndexes)
         {
             TrainingDataset inputData = new();
-            List<TrainingDataUnit> data = new();
+            List<TrainingDataExample> data = new();
             CultureInfo culture = new("en-US");
             try
             {
@@ -44,7 +44,7 @@ namespace NeuralNetwork.Core.DataAccess
                             inputs.Add(value);
                     }
 
-                    data.Add(new TrainingDataUnit(inputs.ToArray(), outputs.ToArray()));
+                    data.Add(new TrainingDataExample(inputs.ToArray(), outputs.ToArray()));
                 }
             }
             catch

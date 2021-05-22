@@ -17,9 +17,9 @@ namespace NeuralNetwork.Core.Tests
 
             double[] inputValues = new double[] {2.0, 1.5};
             double[] expectedOutput = new double[] {0.3, 0.5};
-            TrainingDataUnit test = new(inputValues, expectedOutput);
+            TrainingDataExample test = new(inputValues, expectedOutput);
 
-            TestResult result = learningManager.RunOneTest(network, test);
+            TestResult result = learningManager.RunOneExample(network, test);
             Assert.Equal(expectedOutput[0], result.expectedValues[0]);
             Assert.Equal(expectedOutput[1], result.expectedValues[1]);
         }
@@ -53,35 +53,35 @@ namespace NeuralNetwork.Core.Tests
             learningManager.LearningRate = 0.3;
             learningManager.ActivationFunction = new SigmoidActivationFunction();
             learningManager.TrainingSet = new() { 
-                new TrainingDataUnit(
+                new TrainingDataExample(
                     new double[] { 1.0, 0.3, 0.4},
                     new double[] { 1.0, 0.0, 0.0}
                     ),
-                new TrainingDataUnit(
+                new TrainingDataExample(
                     new double[] { 0.2, 0.9, 0.1 },
                     new double[] { 0.0, 1.0, 0.0 }
                     ),
-                new TrainingDataUnit(
+                new TrainingDataExample(
                     new double[] { 0.0, 0.0, 0.7 },
                     new double[] { 0.0, 0.0, 1.0 }
                     ),
-                new TrainingDataUnit(
+                new TrainingDataExample(
                     new double[] { 1.0, 0.0, 0.0 },
                     new double[] { 1.0, 0.0, 0.0 }
                     ),
-                new TrainingDataUnit(
+                new TrainingDataExample(
                     new double[] { 0.0, 1.0, 0.0 },
                     new double[] { 0.0, 1.0, 0.0 }
                     ),
-                new TrainingDataUnit(
+                new TrainingDataExample(
                     new double[] { 0.0, 0.0, 1.0 },
                     new double[] { 0.0, 0.0, 1.0 }
                     ),
-                new TrainingDataUnit(
+                new TrainingDataExample(
                     new double[] { 0.0, 0.5, 0.0 },
                     new double[] { 0.0, 1.0, 0.0 }
                     ),
-                new TrainingDataUnit(
+                new TrainingDataExample(
                     new double[] { 0.0, 0.0, 0.8 },
                     new double[] { 0.0, 0.0, 1.0 }
                     ),
@@ -92,7 +92,7 @@ namespace NeuralNetwork.Core.Tests
                 double oldAvgError = avgError;
                 for (int j = 0; j < 5; j++)
                 {
-                    avgError = learningManager.RunBackPropagation(network);
+                    avgError = learningManager.RunBackPropagation(network, learningManager.RunAllExamples(network, learningManager.TrainingSet).ToArray());
                 }
                 Assert.True(avgError < oldAvgError);
             }
