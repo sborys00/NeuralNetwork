@@ -5,16 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NeuralNetwork.UI"
         mc:Ignorable="d"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        BorderThickness="10"
         Title="Neural Network" Height="446" Width="800"
         Background="#FF2A2A8B">
-    
+    <Window.Effect>
+        <DropShadowEffect Color="Black" Opacity="0.6" BlurRadius="10" Direction="270" RenderingBias="Quality" ShadowDepth="0"/>
+    </Window.Effect>
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="30"
+        <WindowChrome CaptionHeight="40"
             CornerRadius="0"
-            GlassFrameThickness="0"
-            NonClientFrameEdges="None"
-            ResizeBorderThickness="5"
-            UseAeroCaptionButtons="False">
+            GlassFrameThickness="5"
+            ResizeBorderThickness="10">
         </WindowChrome>
     </WindowChrome.WindowChrome>
     <Window.Resources>
