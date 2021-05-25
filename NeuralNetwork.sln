@@ -3,13 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.UI", "NeuralNetwork.UI\NeuralNetwork.UI.csproj", "{5AB58477-0C98-4E0E-8A19-60D7F0C1DC3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetwork.UI", "NeuralNetwork.UI\NeuralNetwork.UI.csproj", "{5AB58477-0C98-4E0E-8A19-60D7F0C1DC3D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Core", "NeuralNetwork.Core\NeuralNetwork.Core.csproj", "{47D0F438-FE84-49E7-99C7-4D4A3B63FB50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetwork.Core", "NeuralNetwork.Core\NeuralNetwork.Core.csproj", "{47D0F438-FE84-49E7-99C7-4D4A3B63FB50}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeuralNetwork.Core.Tests", "NeuralNetwork.Core.Tests\NeuralNetwork.Core.Tests.csproj", "{AA096944-F112-4D74-8FE6-63516662C3E9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetwork.Core.MvvmCross", "NeuralNetwork.Core.MvvmCross\NeuralNetwork.Core.MvvmCross.csproj", "{C10BBFE8-322E-4F2E-A502-EB22F4274374}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetwork.Core.Tests", "NeuralNetwork.Core.Tests\NeuralNetwork.Core.Tests.csproj", "{AA096944-F112-4D74-8FE6-63516662C3E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +27,6 @@ Global
 		{AA096944-F112-4D74-8FE6-63516662C3E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA096944-F112-4D74-8FE6-63516662C3E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA096944-F112-4D74-8FE6-63516662C3E9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C10BBFE8-322E-4F2E-A502-EB22F4274374}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C10BBFE8-322E-4F2E-A502-EB22F4274374}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C10BBFE8-322E-4F2E-A502-EB22F4274374}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C10BBFE8-322E-4F2E-A502-EB22F4274374}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
