@@ -13,4 +13,8 @@
     <PackageReference Include="Prism.Wpf" Version="8.1.97" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\NeuralNetwork.Core\NeuralNetwork.Core.csproj" />
+  </ItemGroup>
+
 </Project>

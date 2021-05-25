@@ -84,7 +84,8 @@
                             AutomationProperties.Name="NavbarStackPanel">
                             <Button
                                 Name="HomeButton"
-                                Command="{Binding NavigateCommand}" CommandParameter="HomeView">
+                                Command="{Binding NavigateCommand}" 
+                                CommandParameter="HomeView">
                                 Home
                             </Button>
                             <Button
@@ -101,7 +102,8 @@
                             </Button>
                             <Button
                                 Name="TrainingButton"
-                                Command="{Binding NavigateCommand}" CommandParameter="TrainingView">
+                                Command="{Binding NavigateCommand}" 
+                                CommandParameter="TrainingView">
                                 Training
                             </Button>
                         </StackPanel>

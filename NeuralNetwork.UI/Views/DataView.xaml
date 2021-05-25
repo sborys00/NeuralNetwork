@@ -4,15 +4,44 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:NeuralNetwork.UI.Views"
-             mc:Ignorable="d" 
+    xmlns:viewmodels="clr-namespace:NeuralNetwork.UI.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:DataViewModel}"
+    mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TextBlock
-            HorizontalAlignment="Left"
-            Margin="418,209,0,0"
-            Text="DataView"
-            TextWrapping="Wrap"
-            VerticalAlignment="Top" />
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="20" />
+            <ColumnDefinition
+                Width="auto" />
+            <ColumnDefinition
+                Width="*" />
+            <ColumnDefinition
+                Width="20" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="20" />
+            <RowDefinition
+                Height="auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="20" />
+        </Grid.RowDefinitions>
+        <Button
+            Grid.Column="1"
+            Grid.Row="1"
+            Command="{Binding LoadFileCommand}">
+            Select File
+        </Button>
 
+        <DataGrid
+            x:Name="TraningExampleGrid"
+            ItemsSource="{Binding Path=TrainingExamples}"
+            Grid.Column="1"
+            Grid.ColumnSpan="2"
+            Grid.Row="2">
+        </DataGrid>
     </Grid>
 </UserControl>

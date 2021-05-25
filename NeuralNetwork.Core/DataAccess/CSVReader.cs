@@ -18,7 +18,7 @@ namespace NeuralNetwork.Core.DataAccess
         {
             _fileSystem = fileSystem;
         }
-
+        public CSVReader() : this(new FileSystem()) { }
         public async Task<TrainingDataset> ReadInputData(string path, int[] outputIndexes)
         {
             TrainingDataset inputData = new();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NeuralNetwork.Core.DataAccess;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,7 @@ namespace NeuralNetwork.UI.Views
     /// </summary>
     public partial class HomeView : UserControl
     {
-        public HomeView()
+        public HomeView(IFileReader fileReader)
         {
             InitializeComponent();
         }
