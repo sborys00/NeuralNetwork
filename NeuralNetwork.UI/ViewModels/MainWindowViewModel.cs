@@ -15,11 +15,17 @@ namespace NeuralNetwork.UI.ViewModels
     public class MainWindowViewModel : BindableBase
     {
         private readonly IRegionManager _regionManager;
-
+        public DelegateCommand<string> NavigateCommand { get; set; }
         public MainWindowViewModel(IRegionManager regionManager)
         {
             _regionManager = regionManager;
-            _regionManager.RegisterViewWithRegion("ContentRegion", typeof(HomeView));
+
+            NavigateCommand = new DelegateCommand<string>(Navigate);
+        }
+
+        public void Navigate(string view)
+        {
+            _regionManager.RequestNavigate("ContentRegion", view);
         }
     }
 }

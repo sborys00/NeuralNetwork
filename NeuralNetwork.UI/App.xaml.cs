@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using NeuralNetwork.UI;
+using NeuralNetwork.UI.Views;
 using Prism.Ioc;
 using Prism.Unity;
 
@@ -22,6 +23,10 @@ namespace NeuralNetwork.UI
         }
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterForNavigation<HomeView>();
+            containerRegistry.RegisterForNavigation<DesignView>();
+            containerRegistry.RegisterForNavigation<TrainingView>();
+            containerRegistry.RegisterForNavigation<Views.DataView>();
         }
     }
 }

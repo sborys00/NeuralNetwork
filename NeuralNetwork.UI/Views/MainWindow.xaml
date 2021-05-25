@@ -7,6 +7,8 @@
     xmlns:local="clr-namespace:NeuralNetwork.UI.Views"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:viewmodels="clr-namespace:NeuralNetwork.UI.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
     mc:Ignorable="d"
     AllowsTransparency="True"
     WindowStyle="None"
@@ -80,6 +82,28 @@
                             x:Name="NavbarStackPanel"
                             Margin="0 16 0 16"
                             AutomationProperties.Name="NavbarStackPanel">
+                            <Button
+                                Name="HomeButton"
+                                Command="{Binding NavigateCommand}" CommandParameter="HomeView">
+                                Home
+                            </Button>
+                            <Button
+                                Name="DataButton"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="DataView">
+                                Data
+                            </Button>
+                            <Button
+                                Name="DesignButton"
+                                Command="{Binding NavigateCommand}"
+                                CommandParameter="DesignView">
+                                Design
+                            </Button>
+                            <Button
+                                Name="TrainingButton"
+                                Command="{Binding NavigateCommand}" CommandParameter="TrainingView">
+                                Training
+                            </Button>
                         </StackPanel>
                     </DockPanel>
                 </materialDesign:DrawerHost.LeftDrawerContent>
