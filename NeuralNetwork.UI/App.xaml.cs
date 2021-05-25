@@ -5,13 +5,23 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using NeuralNetwork.UI;
+using Prism.Ioc;
+using Prism.Unity;
 
 namespace NeuralNetwork.UI
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App : Application
+    public partial class App : PrismApplication
     {
+        // RegisterTypes function is here
+
+        protected override Window CreateShell()
+        {
+            var w = Container.Resolve<Views.MainWindow>();
+            return w;
+        }
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+        }
     }
 }

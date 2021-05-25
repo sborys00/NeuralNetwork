@@ -1,5 +1,4 @@
-﻿using MaterialDesignThemes.Wpf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,11 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace NeuralNetwork.UI
-{ 
-    public partial class MainWindow : Window
+namespace NeuralNetwork.UI.Views
+{
+    /// <summary>
+    /// Interaction logic for HomeView.xaml
+    /// </summary>
+    public partial class HomeView : UserControl
     {
-        public MainWindow()
+        public HomeView()
         {
             InitializeComponent();
         }
