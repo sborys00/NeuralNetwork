@@ -23,6 +23,8 @@
             <RowDefinition
                 Height="20" />
             <RowDefinition
+                Height="auto" />            
+            <RowDefinition
                 Height="auto" />
             <RowDefinition
                 Height="*" />
@@ -35,13 +37,18 @@
             Command="{Binding LoadFileCommand}">
             Select File
         </Button>
-
-        <DataGrid
-            x:Name="TraningExampleGrid"
-            ItemsSource="{Binding Path=TrainingExamples}"
+        <ScrollViewer
             Grid.Column="1"
             Grid.ColumnSpan="2"
-            Grid.Row="2">
-        </DataGrid>
+            Grid.Row="2"
+            MaxHeight="600">
+            <DataGrid
+                x:Name="TraningExampleGrid"
+                ItemsSource="{Binding Path=DataTable}"
+                AutoGenerateColumns="True"
+                SelectionMode="Extended"
+                SelectionUnit="FullRow">
+            </DataGrid>
+        </ScrollViewer>
     </Grid>
 </UserControl>
