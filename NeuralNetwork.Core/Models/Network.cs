@@ -7,7 +7,7 @@ using NeuralNetwork.Core.ExtensionMethods;
 
 namespace NeuralNetwork.Core.Models
 {
-    public class Network
+    public class Network : INetwork
     {
         public List<Layer> Layers { get; set; } = new();
         

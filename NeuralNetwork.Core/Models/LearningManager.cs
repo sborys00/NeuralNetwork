@@ -25,7 +25,7 @@ namespace NeuralNetwork.Core.Models
         /// </summary>
         /// <param name="network">Instance of Network to be tested</param>
         /// <returns></returns>
-        public List<TestResult> RunAllExamples(Network network, List<TrainingDataExample> examples)
+        public List<TestResult> RunAllExamples(INetwork network, List<TrainingDataExample> examples)
         {
             List<TestResult> results = new();
             foreach (var test in examples)
@@ -41,7 +41,7 @@ namespace NeuralNetwork.Core.Models
         /// <param name="network">Network instance to be tested</param>
         /// <param name="example">Unit of training data</param>
         /// <returns></returns>
-        public TestResult RunOneExample(Network network, TrainingDataExample example)
+        public TestResult RunOneExample(INetwork network, TrainingDataExample example)
         {
             var (outputs, inputs) = network.CalculateOutput(example.inputValues, this.ActivationFunction.Function);
             var lastLayer = outputs.Last();
@@ -61,7 +61,7 @@ namespace NeuralNetwork.Core.Models
             return new TestResult(expected, actual, outputs, inputs);
         }
 
-        public double RunBackPropagation(Network network, TestResult[] trainingDataResults)
+        public double RunBackPropagation(INetwork network, TestResult[] trainingDataResults)
         {
             double[][][] deltaSum = new double[network.Layers.Count - 1][][];
             for (int i = 0; i < network.Layers.Count - 1; i++)
@@ -122,7 +122,7 @@ namespace NeuralNetwork.Core.Models
             return weightDeltas;
         }
         
-        public TrainingResult[] TrainForMultipleEpochs(Network network, int numberOfEpochs)
+        public TrainingResult[] TrainForMultipleEpochs(INetwork network, int numberOfEpochs)
         {
             TrainingResult[] results = new TrainingResult[numberOfEpochs];
             for (int i = 0; i < numberOfEpochs; i++)
@@ -132,7 +132,7 @@ namespace NeuralNetwork.Core.Models
             return results;
         }
         
-        public TrainingResult TrainForOneEpoch(Network network)
+        public TrainingResult TrainForOneEpoch(INetwork network)
         {
             TestResult[] trainingResults = RunAllExamples(network, this.TrainingSet).ToArray();
             TestResult[] testResults = RunAllExamples(network, this.TestSet).ToArray();

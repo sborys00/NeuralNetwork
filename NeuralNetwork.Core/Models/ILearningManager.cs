@@ -13,11 +13,11 @@ namespace NeuralNetwork.Core.Models
         List<TrainingDataExample> TrainingSet { get; set; }
         List<TrainingDataExample> TestSet { get; set; }
 
-        TrainingResult TrainForOneEpoch(Network network);
-        TrainingResult[] TrainForMultipleEpochs(Network network, int numberOfEpochs);
+        TrainingResult TrainForOneEpoch(INetwork network);
+        TrainingResult[] TrainForMultipleEpochs(INetwork network, int numberOfEpochs);
 
-        TestResult RunOneExample(Network network, TrainingDataExample test);
-        List<TestResult> RunAllExamples(Network network, List<TrainingDataExample> examples);
+        TestResult RunOneExample(INetwork network, TrainingDataExample test);
+        List<TestResult> RunAllExamples(INetwork network, List<TrainingDataExample> examples);
 
     }
 }
