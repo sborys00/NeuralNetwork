@@ -12,20 +12,18 @@ namespace NeuralNetwork.UI.ViewModels
 {
     class TrainingViewModel : BindableBase
     {
-        /*
-         * Chart lags when large series are present
-         * Needs optimization
-         * 
-         */
-
         private readonly ILearningManager _learningManager;
         private readonly INetwork _network;
+
+        private readonly LineSeries trainErrorSeries = new() { Title = "Training error", PointGeometry = null };
+        private readonly LineSeries testErrorSeries = new() { Title = "Test error", PointGeometry = null };
+        private readonly ChartValues<double> trainErrorValues = new();
+        private readonly ChartValues<double> testErrorValues = new();
         public DelegateCommand TrainForOneEpochCommand { get; set; }
         public DelegateCommand TrainFor50EpochsCommand { get; set; }
         public DelegateCommand InitializeWeightsCommand { get; set; }
 
-        public ChartValues<ObservablePoint> TrainErrorSeries { get; set; } = new();
-        public ChartValues<ObservablePoint> TestErrorSeries { get; set; } = new();
+        public SeriesCollection SeriesCollection { get; set; } = new SeriesCollection();
 
         public TrainingViewModel(ILearningManager learningManager, INetwork network)
         {
@@ -35,6 +33,10 @@ namespace NeuralNetwork.UI.ViewModels
             TrainFor50EpochsCommand = new DelegateCommand(TrainFor50Epochs);
             InitializeWeightsCommand = new DelegateCommand(InitializeWeights);
 
+            SeriesCollection.Add(trainErrorSeries);
+            SeriesCollection.Add(testErrorSeries);
+            trainErrorSeries.Values = trainErrorValues;
+            testErrorSeries.Values = testErrorValues;
             // for testing
             CreateDataForTesting(out _network);
         }
@@ -42,25 +44,22 @@ namespace NeuralNetwork.UI.ViewModels
         public void TrainForOneEpoch()
         {
             TrainingResult trainingResult = _learningManager.TrainForOneEpoch(_network);
-            int index = TrainErrorSeries.Count + 1;
-            TrainErrorSeries.Add(new ObservablePoint(index, trainingResult.TrainingExampleTotalError));
-            TestErrorSeries.Add(new ObservablePoint(index, trainingResult.TestExampleTotalError));
+            trainErrorValues.Add(trainingResult.TrainingExampleTotalError);
+            testErrorValues.Add(trainingResult.TestExampleTotalError);
         }
 
         public void TrainFor50Epochs()
         {
             TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, 50);
-            int trainIndex = TrainErrorSeries.Count + 1;
-            int testIndex = trainIndex;
-            TrainErrorSeries.AddRange(trainingResult.Select(r => new ObservablePoint(trainIndex++, r.TrainingExampleTotalError)));
-            TestErrorSeries.AddRange(trainingResult.Select(r => new ObservablePoint(testIndex++, r.TestExampleTotalError)));
+            trainErrorValues.AddRange(trainingResult.Select(r =>  r.TrainingExampleTotalError));
+            testErrorValues.AddRange(trainingResult.Select(r => r.TestExampleTotalError));
         }
 
         public void InitializeWeights()
         {
             _network.InitializeWeights();
-            TrainErrorSeries.Clear();
-            TestErrorSeries.Clear();
+            trainErrorValues.Clear();
+            testErrorValues.Clear();
         }
 
         private void CreateDataForTesting(out INetwork network)
