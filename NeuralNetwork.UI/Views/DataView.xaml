@@ -50,5 +50,11 @@
                 SelectionUnit="FullRow">
             </DataGrid>
         </ScrollViewer>
+        <Button
+            Grid.Column="1"
+            Grid.Row="3"
+            Command="{Binding SaveTableDataCommand}">
+            Save Dataset
+        </Button>
     </Grid>
 </UserControl>

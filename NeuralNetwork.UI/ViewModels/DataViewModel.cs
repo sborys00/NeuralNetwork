@@ -15,8 +15,15 @@ namespace NeuralNetwork.UI.ViewModels
     public class DataViewModel : BindableBase
     {
         private readonly IFileReader _fileReader;
+        public DataViewModel(IFileReader fileReader)
+        {
+            _fileReader = fileReader;
+            LoadFileCommand = new DelegateCommand(LoadFile);
+            SaveTableDataCommand = new DelegateCommand(SaveTableData);
+        }
 
         public DelegateCommand LoadFileCommand { get; set; }
+        public DelegateCommand SaveTableDataCommand { get; set; }
 
         private DataTable dataTable;
 
@@ -25,18 +32,19 @@ namespace NeuralNetwork.UI.ViewModels
             get { return dataTable; }
             set { SetProperty(ref dataTable, value); }
         }
-
-
-        public DataViewModel(IFileReader fileReader)
-        {
-            _fileReader = fileReader;
-            LoadFileCommand = new DelegateCommand(LoadFile);
-        }
         public async void LoadFile()
         {
             string fileName = SelectDataFile();
             TrainingDataset data = await _fileReader.ReadInputData(fileName, new int[] { 3 });
             DataTable = GenerateDataTable(data);
+        }
+
+        public void SaveTableData()
+        {
+            List<TrainingDataExample> trainingExamples = new();
+            List<TrainingDataExample> testExamples = new();
+
+            GetExamplesFromTable(dataTable, 3 , ref trainingExamples, ref testExamples);
         }
 
         public string SelectDataFile()
@@ -85,6 +93,24 @@ namespace NeuralNetwork.UI.ViewModels
                 dataTable.Rows.Add(row);
             }
             return dataTable;
+        }
+
+        private void GetExamplesFromTable(DataTable table, int inputCount, ref List<TrainingDataExample> training, ref List<TrainingDataExample> test)
+        {
+            foreach(DataRow row in table.Rows)
+            {
+                double[] values = new double[row.ItemArray.Length-1];
+                for (int i = 1; i < row.ItemArray.Length; i++)
+                {
+                    values[i - 1] = row.Field<double>(i);
+
+                }
+                TrainingDataExample example = new(values[..inputCount], values[inputCount..]);
+                if (row.Field<bool>(0))
+                    test.Add(example);
+                else
+                    training.Add(example);
+            }
         }
     }
 }
