@@ -30,11 +30,14 @@ namespace NeuralNetwork.UI.ViewModels
             _eventAggregator = eventAggregator;
             LoadFileCommand = new DelegateCommand(LoadFile);
             SaveTableDataCommand = new DelegateCommand(SaveTableData);
-            
+            SetPercentageAsTestCommand = new DelegateCommand<string>(SetPercentageAsTest);
+            UnsetAllTestExamplesCommand = new DelegateCommand(UnsetAllTestExamples);
         }
 
         public DelegateCommand LoadFileCommand { get; set; }
         public DelegateCommand SaveTableDataCommand { get; set; }
+        public DelegateCommand<string> SetPercentageAsTestCommand { get; set; }
+        public DelegateCommand UnsetAllTestExamplesCommand { get; set; }
 
         private DataTable dataTable;
         public DataTable DataTable
@@ -163,6 +166,30 @@ namespace NeuralNetwork.UI.ViewModels
                 TestExamples = testExamples,
                 VariableNames = variableNames
             };
+        }
+
+        private void SetPercentageAsTest(string percentageStr = "33")
+        {
+            int percentage = int.Parse(percentageStr);
+            var random = new Random();
+            HashSet<int> indexes = new();
+            int count = (int)Math.Round((int)percentage / 100d * DataTable.Rows.Count);
+            while (indexes.Count < percentage / 100d * DataTable.Rows.Count)
+            {
+                indexes.Add(random.Next(0, dataTable.Rows.Count));
+            }
+            foreach(int i in indexes)
+            {
+                DataTable.Rows[i].SetField<bool>(0, true);
+            }
+        }
+
+        private void UnsetAllTestExamples()
+        {
+            foreach(DataRow row in DataTable.Rows)
+            {
+                row.SetField<bool>(0, false);
+            }
         }
     }
 }

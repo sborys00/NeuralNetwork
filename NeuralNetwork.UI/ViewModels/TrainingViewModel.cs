@@ -77,7 +77,7 @@ namespace NeuralNetwork.UI.ViewModels
 
         public void TrainFor50Epochs()
         {
-            TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, 5000);
+            TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, 50);
             foreach(var result in trainingResult)
             {
                 TrainingErrorSeries.Points.Add(new DataPoint(TrainingErrorSeries.Points.Count + 1, result.TrainingExampleTotalError));
@@ -111,7 +111,7 @@ namespace NeuralNetwork.UI.ViewModels
             // made for testing, to be removed later on
 
             _learningManager.ActivationFunction = new SigmoidActivationFunction();
-            _learningManager.LearningRate = 0.3;
+            _learningManager.LearningRate = 0.1;
 
             NetworkBuilder nb = new();
             network = nb.AddLayers(3, 4, 3).Build();

@@ -50,11 +50,22 @@
                 SelectionUnit="FullRow">
             </DataGrid>
         </ScrollViewer>
-        <Button
+        <StackPanel
             Grid.Column="1"
-            Grid.Row="3"
-            Command="{Binding SaveTableDataCommand}">
-            Save Dataset
-        </Button>
+            Grid.Row="3">
+            <Button
+                Command="{Binding SaveTableDataCommand}">
+                Save Dataset
+            </Button>
+            <Button
+                Command="{Binding SetPercentageAsTestCommand}"
+                CommandParameter="33">
+                Set 33% as tests
+            </Button>
+            <Button
+                Command="{Binding UnsetAllTestExamplesCommand}">
+                Unset all tests
+            </Button>
+        </StackPanel>
     </Grid>
 </UserControl>
