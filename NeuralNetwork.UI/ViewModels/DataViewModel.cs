@@ -41,10 +41,7 @@ namespace NeuralNetwork.UI.ViewModels
 
         public void SaveTableData()
         {
-            List<TrainingDataExample> trainingExamples = new();
-            List<TrainingDataExample> testExamples = new();
-
-            GetExamplesFromTable(dataTable, 3 , ref trainingExamples, ref testExamples);
+            TrainingDataset dataset = GetExamplesFromTable(dataTable, 3);
         }
 
         public string SelectDataFile()
@@ -65,7 +62,8 @@ namespace NeuralNetwork.UI.ViewModels
         private DataTable GenerateDataTable(TrainingDataset trainingDataset)
         {
             DataTable dataTable = new();
-            List<TrainingDataExample> dataset = trainingDataset.Dataset.ToList();
+            List<TrainingDataExample> dataset = trainingDataset.TrainingExamples.ToList();
+            dataset.AddRange(trainingDataset.TestExamples);
             int inputCount = dataset[0].inputValues.Length;
             int outputCount = dataset[0].expectedOutputs.Length;
 
@@ -95,22 +93,46 @@ namespace NeuralNetwork.UI.ViewModels
             return dataTable;
         }
 
-        private void GetExamplesFromTable(DataTable table, int inputCount, ref List<TrainingDataExample> training, ref List<TrainingDataExample> test)
+        private TrainingDataset GetExamplesFromTable(DataTable table, int inputCount)
         {
+            List<TrainingDataExample> trainingExamples = new();
+            List<TrainingDataExample> testExamples = new();
+            List<string> variableNames = new();
+            foreach(DataColumn col in table.Columns)
+            {
+                //skip first column
+                if (table.Columns.IndexOf(col) == 0)
+                    continue;
+
+                variableNames.Add(col.ColumnName);
+            }
             foreach(DataRow row in table.Rows)
             {
                 double[] values = new double[row.ItemArray.Length-1];
                 for (int i = 1; i < row.ItemArray.Length; i++)
                 {
-                    values[i - 1] = row.Field<double>(i);
-
+                    try
+                    {
+                        values[i - 1] = row.Field<double>(i);
+                    }
+                    catch
+                    {
+                        break;
+                    }
                 }
                 TrainingDataExample example = new(values[..inputCount], values[inputCount..]);
                 if (row.Field<bool>(0))
-                    test.Add(example);
+                    testExamples.Add(example);
                 else
-                    training.Add(example);
+                    trainingExamples.Add(example);
             }
+
+            return new TrainingDataset()
+            {
+                TrainingExamples = trainingExamples,
+                TestExamples = testExamples,
+                VariableNames = variableNames
+            };
         }
     }
 }

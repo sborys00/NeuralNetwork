@@ -27,20 +27,20 @@ namespace NeuralNetwork.Core.Tests
             mockFileSystem.AddFile(@"C:\data\input.txt", mockInputFile);
             IFileReader fr = new CSVReader(mockFileSystem);
             TrainingDataset data = await fr.ReadInputData(path, new int[] {2, 3});
-            Assert.Equal(1.1, data.Dataset.ElementAt(0).inputValues[0]);
-            Assert.Equal(2.1, data.Dataset.ElementAt(0).inputValues[1]);
-            Assert.Equal(1.0, data.Dataset.ElementAt(0).expectedOutputs[0]);
-            Assert.Equal(1.0, data.Dataset.ElementAt(0).expectedOutputs[1]);
+            Assert.Equal(1.1, data.TrainingExamples.ElementAt(0).inputValues[0]);
+            Assert.Equal(2.1, data.TrainingExamples.ElementAt(0).inputValues[1]);
+            Assert.Equal(1.0, data.TrainingExamples.ElementAt(0).expectedOutputs[0]);
+            Assert.Equal(1.0, data.TrainingExamples.ElementAt(0).expectedOutputs[1]);
                                        
-            Assert.Equal(0.3, data.Dataset.ElementAt(1).inputValues[0]);
-            Assert.Equal(3.2, data.Dataset.ElementAt(1).inputValues[1]);
-            Assert.Equal(3.2, data.Dataset.ElementAt(1).expectedOutputs[0]);
-            Assert.Equal(0.2, data.Dataset.ElementAt(1).expectedOutputs[1]);
+            Assert.Equal(0.3, data.TrainingExamples.ElementAt(1).inputValues[0]);
+            Assert.Equal(3.2, data.TrainingExamples.ElementAt(1).inputValues[1]);
+            Assert.Equal(3.2, data.TrainingExamples.ElementAt(1).expectedOutputs[0]);
+            Assert.Equal(0.2, data.TrainingExamples.ElementAt(1).expectedOutputs[1]);
                                        
-            Assert.Equal(5.3, data.Dataset.ElementAt(2).inputValues[0]);
-            Assert.Equal(1.1, data.Dataset.ElementAt(2).inputValues[1]);
-            Assert.Equal(2.1, data.Dataset.ElementAt(2).expectedOutputs[0]);
-            Assert.Equal(0.1, data.Dataset.ElementAt(2).expectedOutputs[1]);
+            Assert.Equal(5.3, data.TrainingExamples.ElementAt(2).inputValues[0]);
+            Assert.Equal(1.1, data.TrainingExamples.ElementAt(2).inputValues[1]);
+            Assert.Equal(2.1, data.TrainingExamples.ElementAt(2).expectedOutputs[0]);
+            Assert.Equal(0.1, data.TrainingExamples.ElementAt(2).expectedOutputs[1]);
         }
     }
 }

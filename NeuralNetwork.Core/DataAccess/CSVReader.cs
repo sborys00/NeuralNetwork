@@ -51,7 +51,8 @@ namespace NeuralNetwork.Core.DataAccess
             {
                 throw;
             }
-            inputData.Dataset = data;
+            inputData.TrainingExamples = data;
+            inputData.TestExamples = new List<TrainingDataExample>();
             return inputData;
         }
     }
