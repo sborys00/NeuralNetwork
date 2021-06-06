@@ -1,7 +1,9 @@
 ﻿using NeuralNetwork.Core.Models;
+using NeuralNetwork.UI.Event;
 using OxyPlot;
 using OxyPlot.Series;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using System;
 using System.Collections;
@@ -14,18 +16,18 @@ namespace NeuralNetwork.UI.ViewModels
     {
         private readonly ILearningManager _learningManager;
         private readonly INetwork _network;
+        private readonly IEventAggregator _eventAggregator;
 
-        public DelegateCommand TrainForOneEpochCommand { get; set; }
-        public DelegateCommand TrainFor50EpochsCommand { get; set; }
-        public DelegateCommand InitializeWeightsCommand { get; set; }
-
-        public TrainingViewModel(ILearningManager learningManager, INetwork network)
+        public TrainingViewModel(ILearningManager learningManager, INetwork network, IEventAggregator eventAggregator)
         {
             _learningManager = learningManager;
             _network = network;
+            _eventAggregator = eventAggregator;
             TrainForOneEpochCommand = new DelegateCommand(TrainForOneEpoch);
             TrainFor50EpochsCommand = new DelegateCommand(TrainFor50Epochs);
             InitializeWeightsCommand = new DelegateCommand(InitializeWeights);
+
+            _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateTrainingDataset);
 
             // for testing
             CreateDataForTesting(out _network);
@@ -34,9 +36,25 @@ namespace NeuralNetwork.UI.ViewModels
             this.PlotModel.Series.Add(TrainingErrorSeries);
             this.PlotModel.Series.Add(TestErrorSeries);
         }
+        public DelegateCommand TrainForOneEpochCommand { get; set; }
+        public DelegateCommand TrainFor50EpochsCommand { get; set; }
+        public DelegateCommand InitializeWeightsCommand { get; set; }
+
         public PlotModel PlotModel { get; private set; }
         public LineSeries TrainingErrorSeries { get; set; } = new();
         public LineSeries TestErrorSeries { get; set; } = new();
+
+        private TrainingDataset _trainingDataset;
+
+        public TrainingDataset TrainingDataset
+        {
+            get { return _trainingDataset; }
+            set 
+            { 
+                _trainingDataset = value; 
+            }
+        }
+
 
         public void TrainForOneEpoch()
         {
@@ -65,11 +83,19 @@ namespace NeuralNetwork.UI.ViewModels
             PlotModel.InvalidatePlot(true);
         }
 
+        private void UpdateTrainingDataset(TrainingDataset dataset)
+        {
+            TrainingDataset = dataset;
+            _learningManager.TrainingSet = dataset.TrainingExamples.ToList();
+            _learningManager.TestSet = dataset.TestExamples.ToList();
+            InitializeWeights();
+        }
+
         private void CreateDataForTesting(out INetwork network)
         {
             // made for testing, to be removed later on
 
-            _learningManager.ActivationFunction = new SigmoidActivationFunction();
+            _learningManager.ActivationFunction = new ReLUActivationFunction();
             _learningManager.LearningRate = 0.3;
 
             NetworkBuilder nb = new();

@@ -12,6 +12,8 @@ using System.Data;
 using Prism.Services.Dialogs;
 using System.Text.Json;
 using System;
+using Prism.Events;
+using NeuralNetwork.UI.Event;
 
 namespace NeuralNetwork.UI.ViewModels
 {
@@ -19,26 +21,20 @@ namespace NeuralNetwork.UI.ViewModels
     {
         private readonly IFileReader _fileReader;
         private readonly IDialogService _dialogService;
+        private readonly IEventAggregator _eventAggregator;
 
-        public DataViewModel(IFileReader fileReader, IDialogService dialogService)
+        public DataViewModel(IFileReader fileReader, IDialogService dialogService, IEventAggregator eventAggregator)
         {
             _fileReader = fileReader;
             _dialogService = dialogService;
+            _eventAggregator = eventAggregator;
             LoadFileCommand = new DelegateCommand(LoadFile);
             SaveTableDataCommand = new DelegateCommand(SaveTableData);
+            
         }
 
         public DelegateCommand LoadFileCommand { get; set; }
         public DelegateCommand SaveTableDataCommand { get; set; }
-
-        private TrainingDataset _trainingDataset;
-
-        public TrainingDataset TrainingDataset
-        {
-            get { return _trainingDataset; }
-            set { _trainingDataset = value; }
-        }
-
 
         private DataTable dataTable;
         public DataTable DataTable
@@ -56,14 +52,15 @@ namespace NeuralNetwork.UI.ViewModels
                 if (outputs[i])
                     outputIndexes.Add(i);
             }
-            TrainingDataset = await _fileReader.ReadInputData(fileName, outputIndexes.ToArray());
-            TrainingDataset.VariableNames = names;
-            DataTable = GenerateDataTable(TrainingDataset);
+            TrainingDataset trainingDataset = await _fileReader.ReadInputData(fileName, outputIndexes.ToArray());
+            trainingDataset.VariableNames = names;
+            DataTable = GenerateDataTable(trainingDataset);
         }
 
         public void SaveTableData()
         {
-            TrainingDataset = GetExamplesFromTable(dataTable, 3);
+            TrainingDataset trainingDataset = GetExamplesFromTable(dataTable, 3);
+            _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Publish(trainingDataset);
         }
 
         public string SelectDataFile()
