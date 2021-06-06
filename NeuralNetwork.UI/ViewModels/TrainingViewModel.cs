@@ -32,17 +32,26 @@ namespace NeuralNetwork.UI.ViewModels
             // for testing
             CreateDataForTesting(out _network);
 
-            this.PlotModel = new PlotModel { Title = "Example 1" };
-            this.PlotModel.Series.Add(TrainingErrorSeries);
-            this.PlotModel.Series.Add(TestErrorSeries);
+            TotalErrorPlot = new PlotModel { Title = "Total Error" };
+            TotalErrorPlot.Series.Add(TrainingErrorSeries);
+            TotalErrorPlot.Series.Add(TestErrorSeries);
+
+            ClassificationCorrectnessLinePlot = new PlotModel { Title = "Classification Correctness" };
+            ClassificationCorrectnessLinePlot.Series.Add(_classificationCorrectnessLineSeries);
         }
         public DelegateCommand TrainForOneEpochCommand { get; set; }
         public DelegateCommand TrainFor50EpochsCommand { get; set; }
         public DelegateCommand InitializeWeightsCommand { get; set; }
 
-        public PlotModel PlotModel { get; private set; }
+        public double ClassificationThreshold { get; set; } = 0.5;
+
+        public PlotModel TotalErrorPlot { get; private set; }
         public LineSeries TrainingErrorSeries { get; set; } = new();
         public LineSeries TestErrorSeries { get; set; } = new();
+
+        public PlotModel ClassificationCorrectnessLinePlot { get; set; }
+
+        private readonly LineSeries _classificationCorrectnessLineSeries = new();
 
         private TrainingDataset _trainingDataset;
 
@@ -61,18 +70,22 @@ namespace NeuralNetwork.UI.ViewModels
             TrainingResult trainingResult = _learningManager.TrainForOneEpoch(_network);
             TrainingErrorSeries.Points.Add(new DataPoint(TrainingErrorSeries.Points.Count + 1, trainingResult.TrainingExampleTotalError));
             TestErrorSeries.Points.Add(new DataPoint(TestErrorSeries.Points.Count + 1, trainingResult.TestExampleTotalError));
-            PlotModel.InvalidatePlot(true);
+            UpdateClassificationCorrectnessLinePlot(trainingResult);
+            TotalErrorPlot.InvalidatePlot(true);
+            ClassificationCorrectnessLinePlot.InvalidatePlot(true);
         }
 
         public void TrainFor50Epochs()
         {
-            TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, 50);
+            TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, 5000);
             foreach(var result in trainingResult)
             {
                 TrainingErrorSeries.Points.Add(new DataPoint(TrainingErrorSeries.Points.Count + 1, result.TrainingExampleTotalError));
                 TestErrorSeries.Points.Add(new DataPoint(TestErrorSeries.Points.Count + 1, result.TestExampleTotalError));
+                UpdateClassificationCorrectnessLinePlot(result);
             }
-            PlotModel.InvalidatePlot(true);
+            TotalErrorPlot.InvalidatePlot(true);
+            ClassificationCorrectnessLinePlot.InvalidatePlot(true);
         }
 
         public void InitializeWeights()
@@ -80,7 +93,9 @@ namespace NeuralNetwork.UI.ViewModels
             _network.InitializeWeights();
             TestErrorSeries.Points.Clear();
             TrainingErrorSeries.Points.Clear();
-            PlotModel.InvalidatePlot(true);
+            _classificationCorrectnessLineSeries.Points.Clear();
+            TotalErrorPlot.InvalidatePlot(true);
+            ClassificationCorrectnessLinePlot.InvalidatePlot(true);
         }
 
         private void UpdateTrainingDataset(TrainingDataset dataset)
@@ -95,7 +110,7 @@ namespace NeuralNetwork.UI.ViewModels
         {
             // made for testing, to be removed later on
 
-            _learningManager.ActivationFunction = new ReLUActivationFunction();
+            _learningManager.ActivationFunction = new SigmoidActivationFunction();
             _learningManager.LearningRate = 0.3;
 
             NetworkBuilder nb = new();
@@ -115,6 +130,26 @@ namespace NeuralNetwork.UI.ViewModels
                 new TrainingDataExample(new double[] { 0.0, 0.5, 0.0 }, new double[] { 0.0, 1.0, 0.0 }),
                 new TrainingDataExample(new double[] { 0.0, 0.0, 0.8 }, new double[] { 0.0, 0.0, 1.0 }),
             };
+        }
+
+        private void UpdateClassificationCorrectnessLinePlot(TrainingResult trainingResult)
+        {
+            int correctCount = 0;
+            foreach(var result in trainingResult.testingResults)
+            {
+                bool correct = true;
+                for (int i = 0; i < result.actualValues.Length; i++)
+                {
+                    //if > 0, then both greater or lower than threshold at the same time
+                    double sideOfThreshold = (result.actualValues[i] - ClassificationThreshold) * (result.expectedValues[i] - ClassificationThreshold);
+                    if (sideOfThreshold < 0)
+                        correct = false;
+                }
+                if (correct)
+                    correctCount++;
+            }
+            double correctPercentage = 100d * correctCount / trainingResult.testingResults.Length;
+            _classificationCorrectnessLineSeries.Points.Add(new DataPoint(_classificationCorrectnessLineSeries.Points.Count + 1, correctPercentage));
         }
     }
 }
