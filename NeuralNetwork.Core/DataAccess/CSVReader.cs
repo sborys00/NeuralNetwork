@@ -59,5 +59,13 @@ namespace NeuralNetwork.Core.DataAccess
             inputData.TestExamples = new List<TrainingDataExample>();
             return inputData;
         }
+        public async Task<int> GetVariableCount(string path)
+        {
+            using StreamReader sr = _fileSystem.File.OpenText(path);
+            string line = await sr.ReadLineAsync();
+            string[] valuesStr = line.Split(",");
+            return valuesStr.Length;
+        }
+
     }
 }

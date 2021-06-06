@@ -42,12 +42,12 @@
             Grid.Row="2"
             TextWrapping="Wrap" />
         
-        <TextBox
-            Text="{Binding Input}"
-            TextWrapping="Wrap"
-            Grid.Row="3"
-            Width="auto"
-            Height="40"/>
+        <DataGrid
+            ItemsSource="{Binding Path=Variables}"
+            CanUserAddRows="False"
+            Grid.Row="3">
+            
+        </DataGrid>
         <Button
             Command="{Binding CloseDialogCommand}"
             CommandParameter="true"

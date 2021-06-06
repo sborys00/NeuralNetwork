@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace NeuralNetwork.UI.ViewModels
@@ -22,14 +23,7 @@ namespace NeuralNetwork.UI.ViewModels
             set { SetProperty(ref _message, value); }
         }
 
-        private string _input = "";
-
-        public string Input
-        {
-            get { return _input; }
-            set { _input = value; }
-        }
-
+        public List<Variable> Variables { get; set; } = new();
 
         private string _title = "Notification";
         public string Title
@@ -49,7 +43,14 @@ namespace NeuralNetwork.UI.ViewModels
             else if (parameter?.ToLower() == "false")
                 result = ButtonResult.Cancel;
 
-            RaiseRequestClose(new DialogResult(result, new DialogParameters($"input={Input}")));
+            string[] names = Variables.Select(v => v.Name).ToArray();
+            bool[] outputs = Variables.Select(v => v.Output).ToArray();
+
+            RaiseRequestClose(new DialogResult(result, new DialogParameters 
+            {
+                { "names",  JsonSerializer.Serialize(names)},
+                { "outputs", JsonSerializer.Serialize(outputs)}
+            }));
         }
         public virtual void RaiseRequestClose(IDialogResult dialogResult)
         {
@@ -58,7 +59,7 @@ namespace NeuralNetwork.UI.ViewModels
 
         public bool CanCloseDialog()
         {
-            return Input.Length > 0;
+            return true;
         }
 
         public void OnDialogClosed()
@@ -69,6 +70,17 @@ namespace NeuralNetwork.UI.ViewModels
         public void OnDialogOpened(IDialogParameters parameters)
         {
             Message = parameters.GetValue<string>("message");
+            int count = parameters.GetValue<int>("count");
+            for (int i = 0; i < count; i++)
+            {
+                Variables.Add(new Variable() { Name = "var" + i, Output = false });
+            }
+        }
+
+        internal class Variable
+        {
+            public string Name { get; set; }
+            public bool Output { get; set; }
         }
     }
 }

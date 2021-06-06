@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Data;
 using Prism.Services.Dialogs;
+using System.Text.Json;
+using System;
 
 namespace NeuralNetwork.UI.ViewModels
 {
@@ -38,15 +40,15 @@ namespace NeuralNetwork.UI.ViewModels
         public async void LoadFile()
         {
             string fileName = SelectDataFile();
-            TrainingDataset data = await _fileReader.ReadInputData(fileName, new int[] { 3 });
-
-            string message = message = $"Enter {data.VariableNames.Count()} variable names separeted with comma(,)";
-            _dialogService.ShowDialog("DataPickerDialogView", new DialogParameters($"message={message}"),
-                r =>
-                {
-                    string dialogInput = r.Parameters.GetValue<string>("input");
-                    data.VariableNames = dialogInput.Split(',');
-                });
+            (string[] names, bool[] outputs) = SelectOutputsAndVariableNames(await _fileReader.GetVariableCount(fileName));
+            List<int> outputIndexes = new();
+            for (int i = 0; i < outputs.Length; i++)
+            {
+                if (outputs[i])
+                    outputIndexes.Add(i);
+            }
+            TrainingDataset data = await _fileReader.ReadInputData(fileName, outputIndexes.ToArray());
+            data.VariableNames = names;
             DataTable = GenerateDataTable(data);
         }
 
@@ -68,6 +70,20 @@ namespace NeuralNetwork.UI.ViewModels
                 return dialog.FileName;
             }
             throw new FileNotFoundException("File could not be loaded");
+        }
+
+        private (string[] names, bool[] outputs) SelectOutputsAndVariableNames(int variableCount)
+        {
+            string message = message = $"Enter variable names and specify outputs";
+            string[] names = Array.Empty<string>();
+            bool[] outputs = Array.Empty<bool>(); 
+            _dialogService.ShowDialog("DataPickerDialogView", new DialogParameters { { "message", message }, { "count", variableCount } },
+                r =>
+                {
+                    names = JsonSerializer.Deserialize<string[]>(r.Parameters.GetValue<string>("names"));
+                    outputs = JsonSerializer.Deserialize<bool[]>(r.Parameters.GetValue<string>("outputs"));
+                });
+            return (names, outputs);
         }
 
         private DataTable GenerateDataTable(TrainingDataset trainingDataset)
