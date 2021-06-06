@@ -31,6 +31,15 @@ namespace NeuralNetwork.UI.ViewModels
         public DelegateCommand LoadFileCommand { get; set; }
         public DelegateCommand SaveTableDataCommand { get; set; }
 
+        private TrainingDataset _trainingDataset;
+
+        public TrainingDataset TrainingDataset
+        {
+            get { return _trainingDataset; }
+            set { _trainingDataset = value; }
+        }
+
+
         private DataTable dataTable;
         public DataTable DataTable
         {
@@ -47,14 +56,14 @@ namespace NeuralNetwork.UI.ViewModels
                 if (outputs[i])
                     outputIndexes.Add(i);
             }
-            TrainingDataset data = await _fileReader.ReadInputData(fileName, outputIndexes.ToArray());
-            data.VariableNames = names;
-            DataTable = GenerateDataTable(data);
+            TrainingDataset = await _fileReader.ReadInputData(fileName, outputIndexes.ToArray());
+            TrainingDataset.VariableNames = names;
+            DataTable = GenerateDataTable(TrainingDataset);
         }
 
         public void SaveTableData()
         {
-            TrainingDataset dataset = GetExamplesFromTable(dataTable, 3);
+            TrainingDataset = GetExamplesFromTable(dataTable, 3);
         }
 
         public string SelectDataFile()
