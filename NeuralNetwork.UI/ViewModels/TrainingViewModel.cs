@@ -1,9 +1,9 @@
-﻿using LiveCharts;
-using LiveCharts.Defaults;
-using LiveCharts.Wpf;
-using NeuralNetwork.Core.Models;
+﻿using NeuralNetwork.Core.Models;
+using OxyPlot;
+using OxyPlot.Series;
 using Prism.Commands;
 using Prism.Mvvm;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +15,9 @@ namespace NeuralNetwork.UI.ViewModels
         private readonly ILearningManager _learningManager;
         private readonly INetwork _network;
 
-        private readonly LineSeries trainErrorSeries = new() { Title = "Training error", PointGeometry = null };
-        private readonly LineSeries testErrorSeries = new() { Title = "Test error", PointGeometry = null };
-        private readonly ChartValues<double> trainErrorValues = new();
-        private readonly ChartValues<double> testErrorValues = new();
         public DelegateCommand TrainForOneEpochCommand { get; set; }
         public DelegateCommand TrainFor50EpochsCommand { get; set; }
         public DelegateCommand InitializeWeightsCommand { get; set; }
-
-        public SeriesCollection SeriesCollection { get; set; } = new SeriesCollection();
 
         public TrainingViewModel(ILearningManager learningManager, INetwork network)
         {
@@ -33,33 +27,42 @@ namespace NeuralNetwork.UI.ViewModels
             TrainFor50EpochsCommand = new DelegateCommand(TrainFor50Epochs);
             InitializeWeightsCommand = new DelegateCommand(InitializeWeights);
 
-            SeriesCollection.Add(trainErrorSeries);
-            SeriesCollection.Add(testErrorSeries);
-            trainErrorSeries.Values = trainErrorValues;
-            testErrorSeries.Values = testErrorValues;
             // for testing
             CreateDataForTesting(out _network);
+
+            this.PlotModel = new PlotModel { Title = "Example 1" };
+            this.PlotModel.Series.Add(TrainingErrorSeries);
+            this.PlotModel.Series.Add(TestErrorSeries);
         }
+        public PlotModel PlotModel { get; private set; }
+        public LineSeries TrainingErrorSeries { get; set; } = new();
+        public LineSeries TestErrorSeries { get; set; } = new();
 
         public void TrainForOneEpoch()
         {
             TrainingResult trainingResult = _learningManager.TrainForOneEpoch(_network);
-            trainErrorValues.Add(trainingResult.TrainingExampleTotalError);
-            testErrorValues.Add(trainingResult.TestExampleTotalError);
+            TrainingErrorSeries.Points.Add(new DataPoint(TrainingErrorSeries.Points.Count + 1, trainingResult.TrainingExampleTotalError));
+            TestErrorSeries.Points.Add(new DataPoint(TestErrorSeries.Points.Count + 1, trainingResult.TestExampleTotalError));
+            PlotModel.InvalidatePlot(true);
         }
 
         public void TrainFor50Epochs()
         {
             TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, 50);
-            trainErrorValues.AddRange(trainingResult.Select(r =>  r.TrainingExampleTotalError));
-            testErrorValues.AddRange(trainingResult.Select(r => r.TestExampleTotalError));
+            foreach(var result in trainingResult)
+            {
+                TrainingErrorSeries.Points.Add(new DataPoint(TrainingErrorSeries.Points.Count + 1, result.TrainingExampleTotalError));
+                TestErrorSeries.Points.Add(new DataPoint(TestErrorSeries.Points.Count + 1, result.TestExampleTotalError));
+            }
+            PlotModel.InvalidatePlot(true);
         }
 
         public void InitializeWeights()
         {
             _network.InitializeWeights();
-            trainErrorValues.Clear();
-            testErrorValues.Clear();
+            TestErrorSeries.Points.Clear();
+            TrainingErrorSeries.Points.Clear();
+            PlotModel.InvalidatePlot(true);
         }
 
         private void CreateDataForTesting(out INetwork network)
