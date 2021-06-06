@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using NeuralNetwork.Core.DataAccess;
+using NeuralNetwork.Core.Models;
 using NeuralNetwork.UI;
 using NeuralNetwork.UI.Views;
 using Prism.Ioc;
@@ -25,6 +26,8 @@ namespace NeuralNetwork.UI
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.Register<IFileReader, CSVReader>();
+            containerRegistry.Register<ILearningManager, LearningManager>();
+            containerRegistry.Register<INetwork, Network>();
 
             containerRegistry.RegisterForNavigation<HomeView>();
             containerRegistry.RegisterForNavigation<DesignView>();
