@@ -1,0 +1,62 @@
+﻿<UserControl
+    x:Class="NeuralNetwork.UI.Views.DataPickerDialogView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:prism="http://prismlibrary.com/"
+    xmlns:local="clr-namespace:NeuralNetwork.UI.Views"
+    xmlns:viewmodels="clr-namespace:NeuralNetwork.UI.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:DataPickerDialogViewModel}"
+    mc:Ignorable="d"
+    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+    TextElement.FontWeight="Regular"
+    TextElement.FontSize="13"
+    TextOptions.TextFormattingMode="Ideal"
+    TextOptions.TextRenderingMode="Auto"
+    Background="{DynamicResource MaterialDesignPaper}"
+    FontFamily="{DynamicResource MaterialDesignFont}">
+    <Grid
+        x:Name="LayoutRoot"
+        Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="10" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="Auto" />
+            <RowDefinition
+                Height="*" />
+            <RowDefinition
+                Height="30" />
+            <RowDefinition
+                Height="10" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Text="{Binding Message}"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Grid.Row="2"
+            TextWrapping="Wrap" />
+        
+        <TextBox
+            Text="{Binding Input}"
+            TextWrapping="Wrap"
+            Grid.Row="3"
+            Width="auto"
+            Height="40"/>
+        <Button
+            Command="{Binding CloseDialogCommand}"
+            CommandParameter="true"
+            Content="OK"
+            Width="75"
+            Height="25"
+            HorizontalAlignment="Right"
+            Margin="0,10,0,0"
+            Grid.Row="4"
+            IsDefault="True" />
+    </Grid>
+</UserControl>

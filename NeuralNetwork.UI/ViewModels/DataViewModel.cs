@@ -9,15 +9,19 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Data;
+using Prism.Services.Dialogs;
 
 namespace NeuralNetwork.UI.ViewModels
 {
     public class DataViewModel : BindableBase
     {
         private readonly IFileReader _fileReader;
-        public DataViewModel(IFileReader fileReader)
+        private readonly IDialogService _dialogService;
+
+        public DataViewModel(IFileReader fileReader, IDialogService dialogService)
         {
             _fileReader = fileReader;
+            _dialogService = dialogService;
             LoadFileCommand = new DelegateCommand(LoadFile);
             SaveTableDataCommand = new DelegateCommand(SaveTableData);
         }
@@ -26,7 +30,6 @@ namespace NeuralNetwork.UI.ViewModels
         public DelegateCommand SaveTableDataCommand { get; set; }
 
         private DataTable dataTable;
-
         public DataTable DataTable
         {
             get { return dataTable; }
@@ -36,6 +39,14 @@ namespace NeuralNetwork.UI.ViewModels
         {
             string fileName = SelectDataFile();
             TrainingDataset data = await _fileReader.ReadInputData(fileName, new int[] { 3 });
+
+            string message = message = $"Enter {data.VariableNames.Count()} variable names separeted with comma(,)";
+            _dialogService.ShowDialog("DataPickerDialogView", new DialogParameters($"message={message}"),
+                r =>
+                {
+                    string dialogInput = r.Parameters.GetValue<string>("input");
+                    data.VariableNames = dialogInput.Split(',');
+                });
             DataTable = GenerateDataTable(data);
         }
 
@@ -68,12 +79,9 @@ namespace NeuralNetwork.UI.ViewModels
             int outputCount = dataset[0].expectedOutputs.Length;
 
             dataTable.Columns.Add(new DataColumn() { ColumnName = $"Test", DataType = typeof(bool) });
-            for (int i = 0; i < inputCount + outputCount; i++)
+            for (int i = 0; i < trainingDataset.VariableNames.Count(); i++)
             {
-                if(i < inputCount)
-                    dataTable.Columns.Add(new DataColumn() { ColumnName = $"in {i}", DataType = typeof(double) });
-                else
-                    dataTable.Columns.Add(new DataColumn() { ColumnName = $"out {i - inputCount}", DataType = typeof(double) });
+                    dataTable.Columns.Add(new DataColumn() { ColumnName = trainingDataset.VariableNames.ElementAt(i), DataType = typeof(double) });
             }
 
             for (int i = 0; i < dataset.Count; i++)

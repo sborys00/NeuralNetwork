@@ -31,6 +31,10 @@ namespace NeuralNetwork.Core.DataAccess
                 {
                     string line = await sr.ReadLineAsync();
                     string[] valuesStr = line.Split(",");
+
+                    if (inputData.VariableNames == null)
+                        inputData.VariableNames = new string[valuesStr.Length];
+
                     double[] values = new double[valuesStr.Length];
                     
                     List<double> inputs = new();

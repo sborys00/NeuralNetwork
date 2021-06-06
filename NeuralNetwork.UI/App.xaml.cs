@@ -8,6 +8,7 @@ using System.Windows;
 using NeuralNetwork.Core.DataAccess;
 using NeuralNetwork.Core.Models;
 using NeuralNetwork.UI;
+using NeuralNetwork.UI.ViewModels;
 using NeuralNetwork.UI.Views;
 using Prism.Ioc;
 using Prism.Unity;
@@ -33,6 +34,8 @@ namespace NeuralNetwork.UI
             containerRegistry.RegisterForNavigation<DesignView>();
             containerRegistry.RegisterForNavigation<TrainingView>();
             containerRegistry.RegisterForNavigation<Views.DataView>();
+
+            containerRegistry.RegisterDialog<DataPickerDialogView, DataPickerDialogViewModel>();
 
         }
     }
