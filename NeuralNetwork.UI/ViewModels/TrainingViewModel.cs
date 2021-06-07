@@ -15,7 +15,6 @@ namespace NeuralNetwork.UI.ViewModels
     class TrainingViewModel : BindableBase
     {
         private readonly ILearningManager _learningManager;
-        private readonly INetwork _network;
         private readonly IEventAggregator _eventAggregator;
 
         public TrainingViewModel(ILearningManager learningManager, INetwork network, IEventAggregator eventAggregator)
@@ -28,9 +27,12 @@ namespace NeuralNetwork.UI.ViewModels
             InitializeWeightsCommand = new DelegateCommand(InitializeWeights);
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateTrainingDataset);
+            _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe(UpdateNetwork);
 
             // for testing
-            CreateDataForTesting(out _network);
+            //CreateDataForTesting(out _network);\
+            _learningManager.ActivationFunction = new SigmoidActivationFunction();
+            _learningManager.LearningRate = 0.1;
 
             TotalErrorPlot = new PlotModel { Title = "Total Error" };
             TotalErrorPlot.Series.Add(TrainingErrorSeries);
@@ -38,6 +40,9 @@ namespace NeuralNetwork.UI.ViewModels
 
             ClassificationCorrectnessLinePlot = new PlotModel { Title = "Classification Correctness" };
             ClassificationCorrectnessLinePlot.Series.Add(_classificationCorrectnessLineSeries);
+
+            _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Publish();
+            _eventAggregator.GetEvent<RequestDatasetUpdate>().Publish();
         }
         public DelegateCommand TrainForOneEpochCommand { get; set; }
         public DelegateCommand TrainFor50EpochsCommand { get; set; }
@@ -54,6 +59,7 @@ namespace NeuralNetwork.UI.ViewModels
         private readonly LineSeries _classificationCorrectnessLineSeries = new();
 
         private TrainingDataset _trainingDataset;
+        private INetwork _network;
 
         public TrainingDataset TrainingDataset
         {
@@ -103,6 +109,12 @@ namespace NeuralNetwork.UI.ViewModels
             TrainingDataset = dataset;
             _learningManager.TrainingSet = dataset.TrainingExamples.ToList();
             _learningManager.TestSet = dataset.TestExamples.ToList();
+            InitializeWeights();
+        }
+
+        private void UpdateNetwork(Network network)
+        {
+            _network = network;
             InitializeWeights();
         }
 

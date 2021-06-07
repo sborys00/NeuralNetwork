@@ -32,6 +32,8 @@ namespace NeuralNetwork.UI.ViewModels
             SaveTableDataCommand = new DelegateCommand(SaveTableData);
             SetPercentageAsTestCommand = new DelegateCommand<string>(SetPercentageAsTest);
             UnsetAllTestExamplesCommand = new DelegateCommand(UnsetAllTestExamples);
+
+            _eventAggregator.GetEvent<RequestDatasetUpdate>().Subscribe(SaveTableData);
         }
 
         public DelegateCommand LoadFileCommand { get; set; }
@@ -62,8 +64,11 @@ namespace NeuralNetwork.UI.ViewModels
 
         public void SaveTableData()
         {
-            TrainingDataset trainingDataset = GetExamplesFromTable(dataTable, 3);
-            _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Publish(trainingDataset);
+            if(DataTable?.Rows?.Count > 0)
+            {
+                TrainingDataset trainingDataset = GetExamplesFromTable(dataTable, 3);
+                _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Publish(trainingDataset);
+            }
         }
 
         public string SelectDataFile()
