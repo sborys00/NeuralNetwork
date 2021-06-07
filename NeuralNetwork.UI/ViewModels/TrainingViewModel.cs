@@ -1,6 +1,7 @@
 ﻿using NeuralNetwork.Core.Models;
 using NeuralNetwork.UI.Event;
 using OxyPlot;
+using OxyPlot.Axes;
 using OxyPlot.Series;
 using Prism.Commands;
 using Prism.Events;
@@ -29,20 +30,15 @@ namespace NeuralNetwork.UI.ViewModels
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateTrainingDataset);
             _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe(UpdateNetwork);
 
-            // for testing
-            //CreateDataForTesting(out _network);\
             _learningManager.ActivationFunction = new SigmoidActivationFunction();
             _learningManager.LearningRate = 0.1;
 
-            TotalErrorPlot = new PlotModel { Title = "Total Error" };
-            TotalErrorPlot.Series.Add(TrainingErrorSeries);
-            TotalErrorPlot.Series.Add(TestErrorSeries);
-
-            ClassificationCorrectnessLinePlot = new PlotModel { Title = "Classification Correctness" };
-            ClassificationCorrectnessLinePlot.Series.Add(_classificationCorrectnessLineSeries);
-
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Publish();
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Publish();
+            
+            // for testing
+            CreateDataForTesting(out _network);
+            ConfigurePlots();
         }
         public DelegateCommand TrainForOneEpochCommand { get; set; }
         public DelegateCommand TrainFor50EpochsCommand { get; set; }
@@ -51,12 +47,12 @@ namespace NeuralNetwork.UI.ViewModels
         public double ClassificationThreshold { get; set; } = 0.5;
 
         public PlotModel TotalErrorPlot { get; private set; }
-        public LineSeries TrainingErrorSeries { get; set; } = new();
-        public LineSeries TestErrorSeries { get; set; } = new();
+        public LineSeries TrainingErrorSeries { get; set; }
+        public LineSeries TestErrorSeries { get; set; }
 
         public PlotModel ClassificationCorrectnessLinePlot { get; set; }
 
-        private readonly LineSeries _classificationCorrectnessLineSeries = new();
+        private LineSeries _classificationCorrectnessLineSeries;
 
         private TrainingDataset _trainingDataset;
         private INetwork _network;
@@ -162,6 +158,50 @@ namespace NeuralNetwork.UI.ViewModels
             }
             double correctPercentage = 100d * correctCount / trainingResult.testingResults.Length;
             _classificationCorrectnessLineSeries.Points.Add(new DataPoint(_classificationCorrectnessLineSeries.Points.Count + 1, correctPercentage));
+        }
+
+        private void ConfigurePlots()
+        {
+            byte opacity = 140;
+
+            TotalErrorPlot = new PlotModel 
+            {
+                Title = "Total Error",
+                PlotAreaBorderColor = OxyColors.Transparent,
+                TextColor = OxyColor.FromArgb(160,255,255,255)
+            };
+            TrainingErrorSeries = new()
+            {
+                Title = "Training",
+                Color = OxyColor.FromAColor(opacity, OxyColors.Red)
+            };
+            TestErrorSeries = new()
+            {
+                Title = "Test",
+                Color = OxyColor.FromAColor(opacity, OxyColors.DeepSkyBlue)
+
+            };
+            TotalErrorPlot.Series.Add(TrainingErrorSeries);
+            TotalErrorPlot.Series.Add(TestErrorSeries);
+
+            ClassificationCorrectnessLinePlot = new PlotModel
+            {
+                Title = "Classification Correctness",
+                PlotAreaBorderColor = OxyColors.Transparent,
+                TextColor = OxyColors.LightGray
+            };
+            ClassificationCorrectnessLinePlot.Axes.Add(new LinearAxis
+            {
+                Position = AxisPosition.Left,
+                AbsoluteMaximum = 100,
+                AbsoluteMinimum = 0,
+            });
+
+            _classificationCorrectnessLineSeries = new()
+            {
+                Color = OxyColor.FromAColor(opacity, OxyColors.DeepSkyBlue)
+            };
+            ClassificationCorrectnessLinePlot.Series.Add(_classificationCorrectnessLineSeries);
         }
     }
 }

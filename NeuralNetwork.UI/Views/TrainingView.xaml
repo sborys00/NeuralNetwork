@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:local="clr-namespace:NeuralNetwork.UI.Views"
     xmlns:oxy="http://oxyplot.org/wpf"
     xmlns:viewmodels="clr-namespace:NeuralNetwork.UI.ViewModels"
@@ -46,14 +47,50 @@
             Grid.Row="3"
             Grid.Column="1"
             Grid.ColumnSpan="2"
-            Model="{Binding TotalErrorPlot}" 
-            Background="Transparent"/>
+            Margin="0 0 20 0"
+            Model="{Binding TotalErrorPlot}"
+            Background="#363636">
+            <oxy:PlotView.DefaultTrackerTemplate>
+                <ControlTemplate>
+                    <oxy:TrackerControl
+                        Position="{Binding Position}">
+                        <oxy:TrackerControl.Background>
+                            <SolidColorBrush Color="DarkGray"></SolidColorBrush>
+                        </oxy:TrackerControl.Background>
+                        <oxy:TrackerControl.Content>
+                            <TextBlock
+                                Text="{Binding}"
+                                Margin="7"
+                                Foreground="Black" />
+                        </oxy:TrackerControl.Content>
+                    </oxy:TrackerControl>
+                </ControlTemplate>
+            </oxy:PlotView.DefaultTrackerTemplate>
+        </oxy:PlotView>
         <oxy:PlotView
             Grid.Row="3"
             Grid.Column="3"
             Grid.ColumnSpan="1"
             Model="{Binding ClassificationCorrectnessLinePlot}"
-            Background="Transparent"/>
+            Background="#363636">
+            <oxy:PlotView.DefaultTrackerTemplate>
+                <ControlTemplate>
+                    <oxy:TrackerControl
+                        Position="{Binding Position}">
+                        <oxy:TrackerControl.Background>
+                            <SolidColorBrush
+                                Color="DarkGray"></SolidColorBrush>
+                        </oxy:TrackerControl.Background>
+                        <oxy:TrackerControl.Content>
+                            <TextBlock
+                                Text="{Binding}"
+                                Margin="7"
+                                Foreground="Black" />
+                        </oxy:TrackerControl.Content>
+                    </oxy:TrackerControl>
+                </ControlTemplate>
+            </oxy:PlotView.DefaultTrackerTemplate>
+        </oxy:PlotView>
         <Button
             Grid.Row="5"
             Grid.Column="1"
