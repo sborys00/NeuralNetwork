@@ -47,6 +47,8 @@ namespace NeuralNetwork.UI.ViewModels
             get { return dataTable; }
             set { SetProperty(ref dataTable, value); }
         }
+
+        public TrainingDataset TrainingDataset { get; set; }
         public async void LoadFile()
         {
             string fileName = SelectDataFile();
@@ -57,16 +59,16 @@ namespace NeuralNetwork.UI.ViewModels
                 if (outputs[i])
                     outputIndexes.Add(i);
             }
-            TrainingDataset trainingDataset = await _fileReader.ReadInputData(fileName, outputIndexes.ToArray());
-            trainingDataset.VariableNames = names;
-            DataTable = GenerateDataTable(trainingDataset);
+            TrainingDataset = await _fileReader.ReadInputData(fileName, outputIndexes.ToArray());
+            TrainingDataset.VariableNames = names;
+            DataTable = GenerateDataTable(TrainingDataset);
         }
 
         public void SaveTableData()
         {
             if(DataTable?.Rows?.Count > 0)
             {
-                TrainingDataset trainingDataset = GetExamplesFromTable(dataTable, 3);
+                TrainingDataset trainingDataset = GetExamplesFromTable();
                 _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Publish(trainingDataset);
             }
         }
@@ -131,20 +133,21 @@ namespace NeuralNetwork.UI.ViewModels
             return dataTable;
         }
 
-        private TrainingDataset GetExamplesFromTable(DataTable table, int inputCount)
+        private TrainingDataset GetExamplesFromTable()
         {
             List<TrainingDataExample> trainingExamples = new();
             List<TrainingDataExample> testExamples = new();
             List<string> variableNames = new();
-            foreach(DataColumn col in table.Columns)
+            int inputCount = TrainingDataset.TrainingExamples.First().inputValues.Length;
+            foreach (DataColumn col in DataTable.Columns)
             {
                 //skip first column
-                if (table.Columns.IndexOf(col) == 0)
+                if (DataTable.Columns.IndexOf(col) == 0)
                     continue;
 
                 variableNames.Add(col.ColumnName);
             }
-            foreach(DataRow row in table.Rows)
+            foreach(DataRow row in DataTable.Rows)
             {
                 double[] values = new double[row.ItemArray.Length-1];
                 for (int i = 1; i < row.ItemArray.Length; i++)
