@@ -73,6 +73,15 @@ namespace NeuralNetwork.Core.Models
         }
 
         /// <summary>
+        /// Adds one neuron to hidden layer at index, where 0 is input layer and amountOfNeurons - 1 is output layer.
+        /// </summary>
+        /// <param name="index"></param>
+        public void AddNeuronToLayer(int index)
+        {
+            ChangeLayerNeuronAmount(index, Layers[index].Neurons.Count + 1);
+        }
+
+        /// <summary>
         /// Sets initial weight values in all layers using Normalized Xavier Weight Initialization
         /// </summary>
         public void InitializeWeights()
