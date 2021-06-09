@@ -26,17 +26,26 @@
             <ColumnDefinition
                 Width="*"></ColumnDefinition>
             <ColumnDefinition
+                Width="*"></ColumnDefinition>
+            <ColumnDefinition
                 Width="20"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <graph:GraphLayout Grid.Column="1" 
+        <graph:GraphLayout Grid.Column="1"
                            Grid.Row="1"
                            Graph="{Binding Graph}"
-                           LayoutAlgorithmType="{Binding LayoutAlgorithmType}"
-                           FlowDirection="{Binding FlowDirection}">
+                           LayoutAlgorithmType="{Binding LayoutAlgorithmType}">
         </graph:GraphLayout>
 
-        <Button Grid.Column="1" Grid.Row="2" Command="{Binding AddNeuronCommand}"></Button>
+        <ItemsControl Grid.Column="2" Grid.Row="1" ItemsSource="{Binding ManageButtons}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid></Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Button Grid.Column="1" Grid.Row="2" Command="{Binding RedrawNetworkCommand}">Reset Positions</Button>
 
     </Grid>
 </UserControl>
