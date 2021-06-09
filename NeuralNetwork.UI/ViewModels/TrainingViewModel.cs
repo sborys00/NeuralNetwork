@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
 
 namespace NeuralNetwork.UI.ViewModels
 {
@@ -17,6 +18,8 @@ namespace NeuralNetwork.UI.ViewModels
     {
         private readonly ILearningManager _learningManager;
         private readonly IEventAggregator _eventAggregator;
+        private INetwork _network;
+
 
         public TrainingViewModel(ILearningManager learningManager, INetwork network, IEventAggregator eventAggregator)
         {
@@ -26,6 +29,11 @@ namespace NeuralNetwork.UI.ViewModels
             TrainForOneEpochCommand = new DelegateCommand(TrainForOneEpoch);
             TrainFor50EpochsCommand = new DelegateCommand(TrainFor50Epochs);
             InitializeWeightsCommand = new DelegateCommand(InitializeWeights);
+            StartAutoTrainCommand = new DelegateCommand(StartAutoTrain);
+            StopAutoTrainCommand = new DelegateCommand(StopAutoTrain);
+
+            ConfigurePlots();
+            Delay = 200;
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateTrainingDataset);
             _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe(UpdateNetwork);
@@ -38,13 +46,40 @@ namespace NeuralNetwork.UI.ViewModels
             
             // for testing
             CreateDataForTesting(out _network);
-            ConfigurePlots();
         }
         public DelegateCommand TrainForOneEpochCommand { get; set; }
         public DelegateCommand TrainFor50EpochsCommand { get; set; }
         public DelegateCommand InitializeWeightsCommand { get; set; }
+        public DelegateCommand StartAutoTrainCommand { get; set; }
+        public DelegateCommand StopAutoTrainCommand { get; set; }
 
         public double ClassificationThreshold { get; set; } = 0.5;
+
+        private double _delay;
+
+        public double Delay
+        {
+            get { return _delay; }
+            set
+            {
+                if (value <= 0)
+                    _delay = 0.00000001;
+                else
+                    _delay = value;
+            }
+        }
+
+        public double LearningRate
+        {
+            get { return _learningManager.LearningRate; }
+            set 
+            {
+                if (value < 0)
+                    return;
+                _learningManager.LearningRate = value;
+            }
+        }
+
 
         public PlotModel TotalErrorPlot { get; private set; }
         public LineSeries TrainingErrorSeries { get; set; }
@@ -52,17 +87,18 @@ namespace NeuralNetwork.UI.ViewModels
 
         public PlotModel ClassificationCorrectnessLinePlot { get; set; }
 
+
         private LineSeries _classificationCorrectnessLineSeries;
 
-        private TrainingDataset _trainingDataset;
-        private INetwork _network;
+        private TrainingDataset trainingDataset;
+        private Timer timer;
 
         public TrainingDataset TrainingDataset
         {
-            get { return _trainingDataset; }
+            get { return trainingDataset; }
             set 
             { 
-                _trainingDataset = value; 
+                trainingDataset = value; 
             }
         }
 
@@ -92,12 +128,33 @@ namespace NeuralNetwork.UI.ViewModels
 
         public void InitializeWeights()
         {
-            _network.InitializeWeights();
+            _network?.InitializeWeights();
             TestErrorSeries.Points.Clear();
             TrainingErrorSeries.Points.Clear();
             _classificationCorrectnessLineSeries.Points.Clear();
             TotalErrorPlot.InvalidatePlot(true);
             ClassificationCorrectnessLinePlot.InvalidatePlot(true);
+        }
+
+        public void StartAutoTrain()
+        {
+            if (timer != null)
+                return;
+
+            timer = new System.Timers.Timer(Delay);
+            timer.Elapsed += OnTimedEvent;
+            timer.AutoReset = true;
+            timer.Enabled = true;
+        }
+
+        public void StopAutoTrain()
+        {
+            if (timer == null)
+                return;
+
+            timer.Enabled = false;
+            timer.Dispose();
+            timer = null;
         }
 
         private void UpdateTrainingDataset(TrainingDataset dataset)
@@ -158,6 +215,11 @@ namespace NeuralNetwork.UI.ViewModels
             }
             double correctPercentage = 100d * correctCount / trainingResult.testingResults.Length;
             _classificationCorrectnessLineSeries.Points.Add(new DataPoint(_classificationCorrectnessLineSeries.Points.Count + 1, correctPercentage));
+        }
+
+        private void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            TrainForOneEpoch();
         }
 
         private void ConfigurePlots()

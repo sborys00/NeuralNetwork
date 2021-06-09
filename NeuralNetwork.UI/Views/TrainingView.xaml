@@ -91,17 +91,36 @@
                 </ControlTemplate>
             </oxy:PlotView.DefaultTrackerTemplate>
         </oxy:PlotView>
-        <Button
+        <StackPanel
+            Orientation="Horizontal"
             Grid.Row="5"
             Grid.Column="1"
-            Command="{Binding TrainForOneEpochCommand}">Step</Button>
-        <Button
+            Grid.ColumnSpan="2">
+            <Button
+                Command="{Binding TrainForOneEpochCommand}">Step</Button>
+            <Button
+                Command="{Binding TrainFor50EpochsCommand}">Step x50</Button>
+            <Button
+                Command="{Binding StartAutoTrainCommand}">Auto Train</Button>
+            <Button
+                Command="{Binding StopAutoTrainCommand}">Pause Auto Train</Button>
+            <Button
+                Command="{Binding InitializeWeightsCommand}">Initialize Weights</Button>
+        </StackPanel>
+        <StackPanel
             Grid.Row="5"
-            Grid.Column="2"
-            Command="{Binding TrainFor50EpochsCommand}">Step x50</Button>
-        <Button
-            Grid.Row="5"
-            Grid.Column="3"
-            Command="{Binding InitializeWeightsCommand}">Initialize Weights</Button>
+            Grid.Column="3">
+            <Label
+                Content="Learning Rate" />
+            <TextBox
+                Text="{Binding LearningRate, Mode=TwoWay}" />
+            <Label Content="Delay"/>
+            <TextBox
+                Text="{Binding Delay, Mode=TwoWay}"/>
+            <Label
+                Content="Classification Threshold" />
+            <TextBox
+                Text="{Binding ClassificationThreshold, Mode=TwoWay}" />
+        </StackPanel>
     </Grid>
 </UserControl>
