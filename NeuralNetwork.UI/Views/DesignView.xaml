@@ -4,14 +4,39 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:NeuralNetwork.UI.Views"
+             xmlns:graph="clr-namespace:GraphShape.Controls;assembly=GraphShape.Controls"
+
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Button
-            Content="Button"
-            HorizontalAlignment="Left"
-            Margin="545,178,0,0"
-            VerticalAlignment="Top" />
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="20"></RowDefinition>
+            <RowDefinition
+                Height="*"></RowDefinition>
+            <RowDefinition
+                Height="50"></RowDefinition>
+            <RowDefinition
+                Height="20"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="20"></ColumnDefinition>
+            <ColumnDefinition
+                Width="*"></ColumnDefinition>
+            <ColumnDefinition
+                Width="20"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <graph:GraphLayout Grid.Column="1" 
+                           Grid.Row="1"
+                           Graph="{Binding Graph}"
+                           LayoutAlgorithmType="{Binding LayoutAlgorithmType}"
+                           FlowDirection="{Binding FlowDirection}">
+        </graph:GraphLayout>
+
+        <Button Grid.Column="1" Grid.Row="2" Command="{Binding AddNeuronCommand}"></Button>
 
     </Grid>
 </UserControl>
