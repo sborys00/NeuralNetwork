@@ -99,7 +99,7 @@
             <Button
                 Command="{Binding TrainForOneEpochCommand}">Step</Button>
             <Button
-                Command="{Binding TrainFor50EpochsCommand}">Step x50</Button>
+                Command="{Binding QuickStepsCommand}">Quick Steps</Button>
             <Button
                 Command="{Binding StartAutoTrainCommand}">Auto Train</Button>
             <Button
@@ -121,6 +121,14 @@
                 Content="Classification Threshold" />
             <TextBox
                 Text="{Binding ClassificationThreshold, Mode=TwoWay}" />
+            <Label
+                Content="Target Error" />
+            <TextBox
+                Text="{Binding TargetError, Mode=TwoWay}" />
+            <Label
+                Content="Quick Steps Count" />
+            <TextBox
+                Text="{Binding NumberOfSteps, Mode=TwoWay}" />
         </StackPanel>
     </Grid>
 </UserControl>

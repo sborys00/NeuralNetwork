@@ -27,7 +27,7 @@ namespace NeuralNetwork.UI.ViewModels
             _network = network;
             _eventAggregator = eventAggregator;
             TrainForOneEpochCommand = new DelegateCommand(TrainForOneEpoch);
-            TrainFor50EpochsCommand = new DelegateCommand(TrainFor50Epochs);
+            QuickStepsCommand = new DelegateCommand(TrainForManyEpochs);
             InitializeWeightsCommand = new DelegateCommand(InitializeWeights);
             StartAutoTrainCommand = new DelegateCommand(StartAutoTrain);
             StopAutoTrainCommand = new DelegateCommand(StopAutoTrain);
@@ -48,12 +48,14 @@ namespace NeuralNetwork.UI.ViewModels
             CreateDataForTesting(out _network);
         }
         public DelegateCommand TrainForOneEpochCommand { get; set; }
-        public DelegateCommand TrainFor50EpochsCommand { get; set; }
+        public DelegateCommand QuickStepsCommand { get; set; }
         public DelegateCommand InitializeWeightsCommand { get; set; }
         public DelegateCommand StartAutoTrainCommand { get; set; }
         public DelegateCommand StopAutoTrainCommand { get; set; }
 
         public double ClassificationThreshold { get; set; } = 0.5;
+        public double TargetError { get; set; } = 0.01;
+        public int NumberOfSteps { get; set; }
 
         private double _delay;
 
@@ -113,9 +115,9 @@ namespace NeuralNetwork.UI.ViewModels
             ClassificationCorrectnessLinePlot.InvalidatePlot(true);
         }
 
-        public void TrainFor50Epochs()
+        public void TrainForManyEpochs()
         {
-            TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, 50);
+            TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, NumberOfSteps);
             foreach(var result in trainingResult)
             {
                 TrainingErrorSeries.Points.Add(new DataPoint(TrainingErrorSeries.Points.Count + 1, result.TrainingExampleTotalError));
