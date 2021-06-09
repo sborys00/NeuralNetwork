@@ -13,6 +13,7 @@ namespace NeuralNetwork.Core.Models
         public void RemoveHiddenLayer(int index);
         public void ChangeLayerNeuronAmount(int index, int amountOfNeurons);
         public void AddNeuronToLayer(int index);
+        public void RemoveNeuronFromLayer(int index);
         public void InitializeWeights();
         public (List<List<double>> outputs, List<List<double>> inputs) CalculateOutput(double[] input, Func<double, double> activationFunction);
     }
