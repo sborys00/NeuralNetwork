@@ -19,5 +19,7 @@ namespace NeuralNetwork.Core.Models
         TestResult RunOneExample(INetwork network, TrainingDataExample test);
         List<TestResult> RunAllExamples(INetwork network, List<TrainingDataExample> examples);
 
+        void ResetEpochCounter();
+
     }
 }

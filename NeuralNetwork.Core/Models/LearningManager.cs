@@ -191,6 +191,11 @@ namespace NeuralNetwork.Core.Models
             return errors;
         }
 
+        public void ResetEpochCounter()
+        {
+            Epoch = 0;
+        }
+
         /// <summary>
         /// Calculates the result of multiplicating error with derivative of activation function
         /// </summary>

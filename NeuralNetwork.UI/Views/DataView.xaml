@@ -25,6 +25,8 @@
             <RowDefinition
                 Height="auto" />            
             <RowDefinition
+                Height="auto"/>
+            <RowDefinition
                 Height="auto" />
             <RowDefinition
                 Height="*" />
@@ -37,35 +39,50 @@
             Command="{Binding LoadFileCommand}">
             Select File
         </Button>
-        <ScrollViewer
+
+        <DataGrid
+            x:Name="TraningExampleGrid"
+            ItemsSource="{Binding Path=DataTable}"
+            AutoGenerateColumns="True"
+            SelectionMode="Extended"
+            SelectionUnit="FullRow"
             Grid.Column="1"
-            Grid.ColumnSpan="2"
             Grid.Row="2"
+            ScrollViewer.CanContentScroll="True"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
             MaxHeight="600">
-            <DataGrid
-                x:Name="TraningExampleGrid"
-                ItemsSource="{Binding Path=DataTable}"
-                AutoGenerateColumns="True"
-                SelectionMode="Extended"
-                SelectionUnit="FullRow">
-            </DataGrid>
-        </ScrollViewer>
-        <StackPanel
+        </DataGrid>
+        <WrapPanel
             Grid.Column="1"
-            Grid.Row="3">
+            Grid.Row="3"
+            Margin="5 15 5 10">
             <Button
-                Command="{Binding SaveTableDataCommand}">
+                Command="{Binding SaveTableDataCommand}"
+                Margin="5 0 5 5">
                 Save Dataset
             </Button>
             <Button
                 Command="{Binding SetPercentageAsTestCommand}"
-                CommandParameter="33">
-                Set 33% as tests
+                Margin="5 0 5 5">
+                Set % as tests
             </Button>
             <Button
-                Command="{Binding UnsetAllTestExamplesCommand}">
+                Command="{Binding UnsetAllTestExamplesCommand}"
+                Margin="5 0 5 5">
                 Unset all tests
             </Button>
+        </WrapPanel>
+        <StackPanel
+            Grid.Column="1"
+            Grid.Row="4"
+            HorizontalAlignment="Left"
+            Margin="5 10 5 10">
+            <Label
+                Content="Test %" />
+            <TextBox
+                Text="{Binding TestPercentage, Mode=TwoWay}" 
+                TextAlignment="center"/>
         </StackPanel>
     </Grid>
 </UserControl>

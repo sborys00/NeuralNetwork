@@ -30,7 +30,7 @@ namespace NeuralNetwork.UI.ViewModels
             _eventAggregator = eventAggregator;
             LoadFileCommand = new DelegateCommand(LoadFile);
             SaveTableDataCommand = new DelegateCommand(SaveTableData);
-            SetPercentageAsTestCommand = new DelegateCommand<string>(SetPercentageAsTest);
+            SetPercentageAsTestCommand = new DelegateCommand(SetPercentageAsTest);
             UnsetAllTestExamplesCommand = new DelegateCommand(UnsetAllTestExamples);
 
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Subscribe(SaveTableData);
@@ -38,16 +38,17 @@ namespace NeuralNetwork.UI.ViewModels
 
         public DelegateCommand LoadFileCommand { get; set; }
         public DelegateCommand SaveTableDataCommand { get; set; }
-        public DelegateCommand<string> SetPercentageAsTestCommand { get; set; }
+        public DelegateCommand SetPercentageAsTestCommand { get; set; }
         public DelegateCommand UnsetAllTestExamplesCommand { get; set; }
 
-        private DataTable dataTable;
+        private DataTable dataTable = new();
         public DataTable DataTable
         {
             get { return dataTable; }
             set { SetProperty(ref dataTable, value); }
         }
 
+        public int TestPercentage { get; set; } = 33;
         public TrainingDataset TrainingDataset { get; set; }
         public async void LoadFile()
         {
@@ -176,13 +177,12 @@ namespace NeuralNetwork.UI.ViewModels
             };
         }
 
-        private void SetPercentageAsTest(string percentageStr = "33")
+        private void SetPercentageAsTest()
         {
-            int percentage = int.Parse(percentageStr);
             var random = new Random();
             HashSet<int> indexes = new();
-            int count = (int)Math.Round((int)percentage / 100d * DataTable.Rows.Count);
-            while (indexes.Count < percentage / 100d * DataTable.Rows.Count)
+            int count = (int)Math.Round(TestPercentage / 100d * DataTable.Rows.Count);
+            while (indexes.Count < count)
             {
                 indexes.Add(random.Next(0, dataTable.Rows.Count));
             }

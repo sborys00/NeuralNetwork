@@ -8,6 +8,7 @@ namespace NeuralNetwork.Core.Models
 {
     public abstract class ActivationFuntion
     {
+        public abstract string Name { get; }
         public abstract Func<double, double> Function { get;} 
         public abstract Func<double, double> Derivative { get;} 
         public static double Sigmoid(double x) => 1 / (1 + Math.Exp(-x));
