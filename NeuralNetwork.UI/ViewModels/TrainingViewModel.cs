@@ -35,6 +35,14 @@ namespace NeuralNetwork.UI.ViewModels
             ConfigurePlots();
             Speed = 1;
 
+            ActivationFunctions = new()
+            {
+                new SigmoidActivationFunction(),
+                new SigmoidBipolarActivationFunction(),
+                new TanhActivationFunction(),
+                new ReLUActivationFunction()
+            };
+
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateTrainingDataset);
             _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe(UpdateNetwork);
 
@@ -83,13 +91,23 @@ namespace NeuralNetwork.UI.ViewModels
             }
         }
 
+        public ActivationFuntion SelectedActivationFunction
+        {
+            get { return _learningManager.ActivationFunction; }
+            set 
+            {
+                _learningManager.ActivationFunction = value; 
+            }
+        }
+
 
         public PlotModel TotalErrorPlot { get; private set; }
         public LineSeries TrainingErrorSeries { get; set; }
         public LineSeries TestErrorSeries { get; set; }
 
-        public PlotModel ClassificationCorrectnessLinePlot { get; set; }
+        public List<ActivationFuntion> ActivationFunctions { get; set; } = new();
 
+        public PlotModel ClassificationCorrectnessLinePlot { get; set; }
 
         private LineSeries _classificationCorrectnessLineSeries;
 

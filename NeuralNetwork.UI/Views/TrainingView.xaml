@@ -139,6 +139,12 @@
                 Content="Quick Steps Count" />
             <TextBox
                 Text="{Binding NumberOfSteps, Mode=TwoWay}" />
+            <Label
+                Content="Activation Function" />
+            <ComboBox
+                ItemsSource="{Binding ActivationFunctions}"
+                SelectedItem="{Binding SelectedActivationFunction}"
+                DisplayMemberPath="Name"/>
         </StackPanel>
     </Grid>
 </UserControl>
