@@ -55,6 +55,7 @@ namespace NeuralNetwork.UI.ViewModels
 
         public double ClassificationThreshold { get; set; } = 0.5;
         public double TargetError { get; set; } = 0.01;
+        public int TargetEpoch { get; set; } = 1000;
         public int NumberOfSteps { get; set; } = 10;
 
         private int _speed;
@@ -133,6 +134,7 @@ namespace NeuralNetwork.UI.ViewModels
         public void InitializeWeights()
         {
             _network?.InitializeWeights();
+            _learningManager?.ResetEpochCounter();
             TestErrorSeries.Points.Clear();
             TrainingErrorSeries.Points.Clear();
             _classificationCorrectnessLineSeries.Points.Clear();
@@ -228,7 +230,7 @@ namespace NeuralNetwork.UI.ViewModels
             if(timer != null)
                 timer.Enabled = true;
 
-            if (TrainingErrorSeries.Points.Last().Y <= TargetError)
+            if (TrainingErrorSeries.Points.Last().Y <= TargetError || _learningManager.Epoch >= TargetEpoch)
                 StopAutoTrain();
 
         }

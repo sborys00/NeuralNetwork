@@ -128,6 +128,10 @@
                 Content="Target Error" />
             <TextBox
                 Text="{Binding TargetError, Mode=TwoWay}" />
+            <Label
+                Content="Target Epoch" />
+            <TextBox
+                Text="{Binding TargetEpoch, Mode=TwoWay}" />
             <Label Content="Auto Train Speed"/>
             <TextBox
                 Text="{Binding Speed, Mode=TwoWay}"/>
