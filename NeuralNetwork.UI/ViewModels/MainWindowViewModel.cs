@@ -21,6 +21,10 @@ namespace NeuralNetwork.UI.ViewModels
             _regionManager = regionManager;
 
             NavigateCommand = new DelegateCommand<string>(Navigate);
+            _regionManager.RegisterViewWithRegion("ContentRegion", typeof(HomeView));
+            _regionManager.RegisterViewWithRegion("ContentRegion", typeof(DataView));
+            _regionManager.RegisterViewWithRegion("ContentRegion", typeof(DesignView));
+            _regionManager.RegisterViewWithRegion("ContentRegion", typeof(TrainingView));
         }
 
         public void Navigate(string view)
