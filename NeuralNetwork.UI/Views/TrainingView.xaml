@@ -21,7 +21,7 @@
             <RowDefinition
                 Height="20"></RowDefinition>
             <RowDefinition
-                Height="300"></RowDefinition>
+                Height="400"></RowDefinition>
             <RowDefinition
                 Height="20"></RowDefinition>
             <RowDefinition
@@ -34,9 +34,9 @@
             <ColumnDefinition
                 Width="20"></ColumnDefinition>
             <ColumnDefinition
-                Width="*"></ColumnDefinition>
+                Width="auto"></ColumnDefinition>
             <ColumnDefinition
-                Width="*"></ColumnDefinition>
+                Width="2*"></ColumnDefinition>
             <ColumnDefinition
                 Width="*"></ColumnDefinition>
             <ColumnDefinition
@@ -91,22 +91,28 @@
                 </ControlTemplate>
             </oxy:PlotView.DefaultTrackerTemplate>
         </oxy:PlotView>
-        <StackPanel
+        <WrapPanel
             Orientation="Horizontal"
             Grid.Row="5"
             Grid.Column="1"
-            Grid.ColumnSpan="2">
+            Grid.ColumnSpan="2"
+            HorizontalAlignment="Center">
             <Button
+                Margin="5 0 5 5"
                 Command="{Binding TrainForOneEpochCommand}">Step</Button>
             <Button
+                Margin="5 0 5 5"
                 Command="{Binding QuickStepsCommand}">Quick Steps</Button>
             <Button
+                Margin="5 0 5 5"
                 Command="{Binding StartAutoTrainCommand}">Auto Train</Button>
             <Button
+                Margin="5 0 5 5"
                 Command="{Binding StopAutoTrainCommand}">Pause Auto Train</Button>
             <Button
+                Margin="5 0 5 5"
                 Command="{Binding InitializeWeightsCommand}">Initialize Weights</Button>
-        </StackPanel>
+        </WrapPanel>
         <StackPanel
             Grid.Row="5"
             Grid.Column="3">
