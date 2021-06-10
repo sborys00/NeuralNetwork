@@ -227,6 +227,10 @@ namespace NeuralNetwork.UI.ViewModels
             TrainForManyEpochs(Speed);
             if(timer != null)
                 timer.Enabled = true;
+
+            if (TrainingErrorSeries.Points.Last().Y <= TargetError)
+                StopAutoTrain();
+
         }
 
         private void ConfigurePlots()
