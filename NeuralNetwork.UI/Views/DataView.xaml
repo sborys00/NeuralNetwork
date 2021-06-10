@@ -52,7 +52,7 @@
             ScrollViewer.CanContentScroll="True"
             ScrollViewer.VerticalScrollBarVisibility="Auto"
             ScrollViewer.HorizontalScrollBarVisibility="Auto"
-            materialDesign:DataGridAssist.CellPadding="4 2 2 2"
+            materialDesign:DataGridAssist.CellPadding="10 4 10 4"
             materialDesign:DataGridAssist.ColumnHeaderPadding="4 2 2 2"
             MaxHeight="600">
         </DataGrid>

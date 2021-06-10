@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using Prism;
+using Prism.Commands;
 
 namespace NeuralNetwork.UI.Views
 { 

@@ -1,5 +1,6 @@
 ﻿<Window
     x:Class="NeuralNetwork.UI.Views.MainWindow"
+    x:Name="mainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -55,18 +56,49 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-
+    
     <materialDesign:DialogHost
         Identifier="RootDialog"
         DialogTheme="Inherit">
 
         <DockPanel>
             <materialDesign:ColorZone
-                Height="20"
+                Height="30"
                 materialDesign:ShadowAssist.ShadowDepth="Depth2"
                 Mode="Custom"
                 Background="#1A1A1A"
                 DockPanel.Dock="Top">
+                <StackPanel
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+                    <Button
+                        Content="{materialDesign:PackIcon WindowMinimize}"
+                        ToolTip="Minimize window"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        HorizontalAlignment="Right"
+                        WindowChrome.IsHitTestVisibleInChrome="true"
+                        Command="{Binding MinimizeWindowCommand}"
+                        CommandParameter="{Binding ElementName=mainWindow}"/>
+                    <Button
+                        Content="{materialDesign:PackIcon WindowMaximize}"
+                        ToolTip="Maximize window"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        HorizontalAlignment="Right"
+                        WindowChrome.IsHitTestVisibleInChrome="true"
+                        Command="{Binding MaximizeWindowCommand}"
+                        CommandParameter="{Binding ElementName=mainWindow}"/>
+                    <Button
+                        Content="{materialDesign:PackIcon WindowClose}"
+                        ToolTip="Close Application"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        HorizontalAlignment="Right"
+                        WindowChrome.IsHitTestVisibleInChrome="true"
+                        Command="{Binding CloseWindowCommand}"
+                        CommandParameter="{Binding ElementName=mainWindow}" />
+                </StackPanel>
             </materialDesign:ColorZone>
             <materialDesign:DrawerHost
                 IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
@@ -144,7 +176,6 @@
                             <RowDefinition
                                 Height="*" />
                         </Grid.RowDefinitions>
-
                         <ContentControl
                             x:Name="ContentRegion"
                             prism:RegionManager.RegionName="ContentRegion"/>

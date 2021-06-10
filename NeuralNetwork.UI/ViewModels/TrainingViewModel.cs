@@ -272,7 +272,6 @@ namespace NeuralNetwork.UI.ViewModels
             {
                 Title = "Test",
                 Color = OxyColor.FromAColor(opacity, OxyColors.DeepSkyBlue)
-
             };
             TotalErrorPlot.Series.Add(TrainingErrorSeries);
             TotalErrorPlot.Series.Add(TestErrorSeries);
@@ -281,7 +280,7 @@ namespace NeuralNetwork.UI.ViewModels
             {
                 Title = "Classification Correctness",
                 PlotAreaBorderColor = OxyColors.Transparent,
-                TextColor = OxyColors.LightGray
+                TextColor = OxyColor.FromArgb(160, 255, 255, 255)
             };
             ClassificationCorrectnessLinePlot.Axes.Add(new LinearAxis
             {

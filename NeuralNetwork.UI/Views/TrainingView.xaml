@@ -42,55 +42,61 @@
             <ColumnDefinition
                 Width="20"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-
-        <oxy:PlotView
+        <materialDesign:Card
             Grid.Row="3"
             Grid.Column="1"
             Grid.ColumnSpan="2"
-            Margin="0 0 20 0"
-            Model="{Binding TotalErrorPlot}"
-            Background="#363636">
-            <oxy:PlotView.DefaultTrackerTemplate>
-                <ControlTemplate>
-                    <oxy:TrackerControl
-                        Position="{Binding Position}">
-                        <oxy:TrackerControl.Background>
-                            <SolidColorBrush Color="DarkGray"></SolidColorBrush>
-                        </oxy:TrackerControl.Background>
-                        <oxy:TrackerControl.Content>
-                            <TextBlock
-                                Text="{Binding}"
-                                Margin="7"
-                                Foreground="Black" />
-                        </oxy:TrackerControl.Content>
-                    </oxy:TrackerControl>
-                </ControlTemplate>
-            </oxy:PlotView.DefaultTrackerTemplate>
-        </oxy:PlotView>
-        <oxy:PlotView
+            Margin="0 0 20 0">
+            <oxy:PlotView
+                Model="{Binding TotalErrorPlot}"
+                Background="Transparent"
+                Margin="0 0 10 0">
+                <oxy:PlotView.DefaultTrackerTemplate>
+                    <ControlTemplate>
+                        <oxy:TrackerControl
+                            Position="{Binding Position}">
+                            <oxy:TrackerControl.Background>
+                                <SolidColorBrush
+                                    Color="DarkGray"></SolidColorBrush>
+                            </oxy:TrackerControl.Background>
+                            <oxy:TrackerControl.Content>
+                                <TextBlock
+                                    Text="{Binding}"
+                                    Margin="7"
+                                    Foreground="Black" />
+                            </oxy:TrackerControl.Content>
+                        </oxy:TrackerControl>
+                    </ControlTemplate>
+                </oxy:PlotView.DefaultTrackerTemplate>
+            </oxy:PlotView>
+        </materialDesign:Card>
+        <materialDesign:Card
             Grid.Row="3"
             Grid.Column="3"
-            Grid.ColumnSpan="1"
-            Model="{Binding ClassificationCorrectnessLinePlot}"
-            Background="#363636">
-            <oxy:PlotView.DefaultTrackerTemplate>
-                <ControlTemplate>
-                    <oxy:TrackerControl
-                        Position="{Binding Position}">
-                        <oxy:TrackerControl.Background>
-                            <SolidColorBrush
-                                Color="DarkGray"></SolidColorBrush>
-                        </oxy:TrackerControl.Background>
-                        <oxy:TrackerControl.Content>
-                            <TextBlock
-                                Text="{Binding}"
-                                Margin="7"
-                                Foreground="Black" />
-                        </oxy:TrackerControl.Content>
-                    </oxy:TrackerControl>
-                </ControlTemplate>
-            </oxy:PlotView.DefaultTrackerTemplate>
-        </oxy:PlotView>
+            Grid.ColumnSpan="1">
+            <oxy:PlotView
+                Model="{Binding ClassificationCorrectnessLinePlot}"
+                Background="Transparent"
+                Margin="0 0 10 0">
+                <oxy:PlotView.DefaultTrackerTemplate>
+                    <ControlTemplate>
+                        <oxy:TrackerControl
+                            Position="{Binding Position}">
+                            <oxy:TrackerControl.Background>
+                                <SolidColorBrush
+                                    Color="DarkGray"></SolidColorBrush>
+                            </oxy:TrackerControl.Background>
+                            <oxy:TrackerControl.Content>
+                                <TextBlock
+                                    Text="{Binding}"
+                                    Margin="7"
+                                    Foreground="Black" />
+                            </oxy:TrackerControl.Content>
+                        </oxy:TrackerControl>
+                    </ControlTemplate>
+                </oxy:PlotView.DefaultTrackerTemplate>
+            </oxy:PlotView>
+        </materialDesign:Card>
         <WrapPanel
             Orientation="Horizontal"
             Grid.Row="5"
