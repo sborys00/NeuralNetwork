@@ -27,13 +27,13 @@ namespace NeuralNetwork.UI.ViewModels
             _network = network;
             _eventAggregator = eventAggregator;
             TrainForOneEpochCommand = new DelegateCommand(TrainForOneEpoch);
-            QuickStepsCommand = new DelegateCommand(TrainForManyEpochs);
+            QuickStepsCommand = new DelegateCommand<int?>(TrainForManyEpochs);
             InitializeWeightsCommand = new DelegateCommand(InitializeWeights);
             StartAutoTrainCommand = new DelegateCommand(StartAutoTrain);
             StopAutoTrainCommand = new DelegateCommand(StopAutoTrain);
 
             ConfigurePlots();
-            Delay = 200;
+            Speed = 1;
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateTrainingDataset);
             _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe(UpdateNetwork);
@@ -48,26 +48,26 @@ namespace NeuralNetwork.UI.ViewModels
             CreateDataForTesting(out _network);
         }
         public DelegateCommand TrainForOneEpochCommand { get; set; }
-        public DelegateCommand QuickStepsCommand { get; set; }
+        public DelegateCommand<int?> QuickStepsCommand { get; set; }
         public DelegateCommand InitializeWeightsCommand { get; set; }
         public DelegateCommand StartAutoTrainCommand { get; set; }
         public DelegateCommand StopAutoTrainCommand { get; set; }
 
         public double ClassificationThreshold { get; set; } = 0.5;
         public double TargetError { get; set; } = 0.01;
-        public int NumberOfSteps { get; set; }
+        public int NumberOfSteps { get; set; } = 10;
 
-        private double _delay;
+        private int _speed;
 
-        public double Delay
+        public int Speed
         {
-            get { return _delay; }
+            get { return _speed; }
             set
             {
                 if (value <= 0)
-                    _delay = 0.00000001;
+                    _speed = 1;
                 else
-                    _delay = value;
+                    _speed = value;
             }
         }
 
@@ -115,9 +115,11 @@ namespace NeuralNetwork.UI.ViewModels
             ClassificationCorrectnessLinePlot.InvalidatePlot(true);
         }
 
-        public void TrainForManyEpochs()
+        public void TrainForManyEpochs(int? count)
         {
-            TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, NumberOfSteps);
+            int epochs = count == null ? NumberOfSteps : Convert.ToInt32(count);
+
+            TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, epochs);
             foreach(var result in trainingResult)
             {
                 TrainingErrorSeries.Points.Add(new DataPoint(TrainingErrorSeries.Points.Count + 1, result.TrainingExampleTotalError));
@@ -143,7 +145,7 @@ namespace NeuralNetwork.UI.ViewModels
             if (timer != null)
                 return;
 
-            timer = new System.Timers.Timer(Delay);
+            timer = new System.Timers.Timer(100);
             timer.Elapsed += OnTimedEvent;
             timer.AutoReset = true;
             timer.Enabled = true;
@@ -181,7 +183,7 @@ namespace NeuralNetwork.UI.ViewModels
             _learningManager.LearningRate = 0.1;
 
             NetworkBuilder nb = new();
-            network = nb.AddLayers(3, 4, 3).Build();
+            network = nb.AddLayers(3, 4, 4, 3).Build();
 
             _learningManager.TrainingSet = new()
             {
@@ -221,7 +223,10 @@ namespace NeuralNetwork.UI.ViewModels
 
         private void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
-            TrainForOneEpoch();
+            timer.Enabled = false;
+            TrainForManyEpochs(Speed);
+            if(timer != null)
+                timer.Enabled = true;
         }
 
         private void ConfigurePlots()

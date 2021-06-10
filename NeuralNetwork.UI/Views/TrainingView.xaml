@@ -114,9 +114,6 @@
                 Content="Learning Rate" />
             <TextBox
                 Text="{Binding LearningRate, Mode=TwoWay}" />
-            <Label Content="Delay"/>
-            <TextBox
-                Text="{Binding Delay, Mode=TwoWay}"/>
             <Label
                 Content="Classification Threshold" />
             <TextBox
@@ -125,6 +122,9 @@
                 Content="Target Error" />
             <TextBox
                 Text="{Binding TargetError, Mode=TwoWay}" />
+            <Label Content="Auto Train Speed"/>
+            <TextBox
+                Text="{Binding Speed, Mode=TwoWay}"/>
             <Label
                 Content="Quick Steps Count" />
             <TextBox
