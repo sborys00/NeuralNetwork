@@ -11,6 +11,7 @@ using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Collections.Generic;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
 
 namespace NeuralNetwork.UI.ViewModels
 {
@@ -31,6 +32,7 @@ namespace NeuralNetwork.UI.ViewModels
             if (_network == null)
             {
                 AssignDefaultNetwork(_dataset);
+                PublishNetworkUpdate();
             }
 
             if (Graph == null)
@@ -44,13 +46,13 @@ namespace NeuralNetwork.UI.ViewModels
         public DelegateCommand RedrawNetworkCommand { get; set; }
 
         public IGraph<object, IEdge<object>> Graph { get; set; }
-        public List<Grid> ManageButtons { get; set; } = new();
+        public ObservableCollection<Grid> ManageButtons { get; set; } = new();
         public string LayoutAlgorithmType { get; set; }
         private Network _network;
         private TrainingDataset _dataset;
         private List<List<object>> drawnNeurons = new List<List<object>>();
         
-        private readonly int neuronSize = 20;
+        private readonly int neuronSize = 50;
         private readonly string neuronPropertyIdentificationName = "Name";
 
         private void UpdateDataset(TrainingDataset dataset)
@@ -114,26 +116,37 @@ namespace NeuralNetwork.UI.ViewModels
             var graph = (BidirectionalGraph<object, IEdge<object>>)Graph;
             graph.Clear();
             drawnNeurons.Clear();
+            ManageButtons.Clear();
             DrawNetwork(Graph);
         }
 
         private void AddNeuron(int layer)
         {
             _network.AddNeuronToLayer(layer);
+            PublishNetworkUpdate();
             var graph = (BidirectionalGraph<object, IEdge<object>>)Graph;
             DrawNeuronOnGraph(graph, layer, _network.Layers[layer].Neurons.Count);
         }
 
         private void RemoveNeuron(int layer)
         {
-            _network.RemoveNeuronFromLayer(layer);
-            var graph = (BidirectionalGraph<object, IEdge<object>>)Graph;
-            RemoveNeuronFromGraph(graph, layer);
+            if (_network.Layers[layer].Neurons.Count <= 1)
+            {
+                RemoveLayer(layer);
+            }
+            else
+            {
+                _network.RemoveNeuronFromLayer(layer);
+                PublishNetworkUpdate();
+                var graph = (BidirectionalGraph<object, IEdge<object>>)Graph;
+                RemoveNeuronFromGraph(graph, layer);
+            }
         }
 
         private void RemoveLayer(int layer)
         {
             _network.RemoveHiddenLayer(layer);
+            PublishNetworkUpdate();
             var graph = (BidirectionalGraph<object, IEdge<object>>)Graph;
             RemoveLayerFromGraph(graph, layer);
         }
@@ -206,6 +219,7 @@ namespace NeuralNetwork.UI.ViewModels
             }
 
             drawnNeurons.RemoveAt(layerIndex);
+            ManageButtons.RemoveAt(layerIndex - 1);
         }
 
         private void DrawAddButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid)
