@@ -24,6 +24,7 @@ namespace NeuralNetwork.UI.ViewModels
             _eventAggregator = eventAggregator;
 
             RedrawNetworkCommand = new DelegateCommand(RedrawNetwork);
+            AddLayerCommand = new DelegateCommand(AddLayer);
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateDataset);
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Subscribe(PublishNetworkUpdate);
@@ -48,6 +49,7 @@ namespace NeuralNetwork.UI.ViewModels
         }
 
         public DelegateCommand RedrawNetworkCommand { get; set; }
+        public DelegateCommand AddLayerCommand { get; set; }
 
         public IGraph<object, IEdge<object>> Graph { get; set; }
         public ObservableCollection<Grid> ManageButtons { get; set; } = new();
@@ -140,7 +142,13 @@ namespace NeuralNetwork.UI.ViewModels
         private void AddNeuron(int layer)
         {
             _network.AddNeuronToLayer(layer);
-            RedrawNetwork();
+            DrawAndPublish();
+        }
+
+        private void AddLayer()
+        {
+            _network.InsertHiddenLayer(_network.Layers.Count - 1, 1);
+            DrawAndPublish();
         }
 
         private void RemoveNeuron(int layer)
@@ -152,14 +160,14 @@ namespace NeuralNetwork.UI.ViewModels
             else
             {
                 _network.RemoveNeuronFromLayer(layer);
-                RedrawNetwork();
+                DrawAndPublish();
             }
         }
 
         private void RemoveLayer(int layer)
         {
             _network.RemoveHiddenLayer(layer);
-            RedrawNetwork();
+            DrawAndPublish();
         }
 
         private void DrawNeuronOnGraph(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, int neuronIndex)
@@ -202,7 +210,7 @@ namespace NeuralNetwork.UI.ViewModels
         {
             Button addButton = new();
             addButton.Name = $"addButton_{layerIndex}";
-            addButton.Width = neuronSize;
+            addButton.Width = neuronSize * 2;
             addButton.Height = neuronSize;
             addButton.Background = new SolidColorBrush { Color = Colors.Green };
             addButton.Content = "+1";
@@ -217,7 +225,7 @@ namespace NeuralNetwork.UI.ViewModels
         {
             Button removeButton = new();
             removeButton.Name = $"removeButton_{layerIndex}";
-            removeButton.Width = neuronSize;
+            removeButton.Width = neuronSize * 2;
             removeButton.Height = neuronSize;
             removeButton.Background = new SolidColorBrush { Color = Colors.Red };
             removeButton.Content = "-1";
@@ -232,7 +240,7 @@ namespace NeuralNetwork.UI.ViewModels
         {
             Button removeLayerButton = new();
             removeLayerButton.Name = $"removeLayerButton_{layerIndex}";
-            removeLayerButton.Width = neuronSize;
+            removeLayerButton.Width = neuronSize * 2;
             removeLayerButton.Height = neuronSize;
             removeLayerButton.Background = new SolidColorBrush { Color = Colors.Red };
             removeLayerButton.Content = "-n";
