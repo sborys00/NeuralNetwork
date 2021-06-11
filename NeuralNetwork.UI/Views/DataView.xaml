@@ -75,6 +75,11 @@
                 Margin="5 0 5 5">
                 Unset all tests
             </Button>
+            <Button
+                Command="{Binding SaveToFileCommand}"
+                Margin="5 0 5 5">
+                Save to file
+            </Button>
         </WrapPanel>
         <StackPanel
             Grid.Column="1"

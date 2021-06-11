@@ -59,6 +59,26 @@ namespace NeuralNetwork.Core.DataAccess
             inputData.TestExamples = new List<TrainingDataExample>();
             return inputData;
         }
+        
+        public async Task WriteInputData(TrainingDataset dataset, string path)
+        {
+            try
+            {
+                using StreamWriter sw = _fileSystem.File.CreateText(path);
+                foreach(var example in dataset.TrainingExamples)
+                {
+                    await sw.WriteLineAsync(ConvertExampleToString(example));
+                }
+                foreach (var example in dataset.TestExamples)
+                {
+                    await sw.WriteLineAsync(ConvertExampleToString(example));
+                }
+            }
+            catch
+            {
+                throw;
+            }
+        }
         public async Task<int> GetVariableCount(string path)
         {
             using StreamReader sr = _fileSystem.File.OpenText(path);
@@ -67,5 +87,13 @@ namespace NeuralNetwork.Core.DataAccess
             return valuesStr.Length;
         }
 
+        private string ConvertExampleToString(TrainingDataExample example)
+        {
+            CultureInfo culture = new("en-US");
+            string[] inputs = example.inputValues.Select(n => n.ToString(culture)).ToArray();
+            string[] outputs = example.expectedOutputs.Select(n => n.ToString(culture)).ToArray();
+            string content = string.Join(',', inputs) + "," + string.Join(',', outputs);
+            return content;
+        }
     }
 }

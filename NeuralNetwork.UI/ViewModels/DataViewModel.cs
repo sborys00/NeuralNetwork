@@ -32,6 +32,7 @@ namespace NeuralNetwork.UI.ViewModels
             SaveTableDataCommand = new DelegateCommand(SaveTableData);
             SetPercentageAsTestCommand = new DelegateCommand(SetPercentageAsTest);
             UnsetAllTestExamplesCommand = new DelegateCommand(UnsetAllTestExamples);
+            SaveToFileCommand = new DelegateCommand(SaveToFile);
 
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Subscribe(SaveTableData);
         }
@@ -40,6 +41,7 @@ namespace NeuralNetwork.UI.ViewModels
         public DelegateCommand SaveTableDataCommand { get; set; }
         public DelegateCommand SetPercentageAsTestCommand { get; set; }
         public DelegateCommand UnsetAllTestExamplesCommand { get; set; }
+        public DelegateCommand SaveToFileCommand { get; set; }
 
         private DataTable dataTable = new();
         public DataTable DataTable
@@ -197,6 +199,22 @@ namespace NeuralNetwork.UI.ViewModels
             foreach(DataRow row in DataTable.Rows)
             {
                 row.SetField<bool>(0, false);
+            }
+        }
+
+        private void SaveToFile()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog()
+            {
+                DefaultExt = ".csv",
+                Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
+                Title = "Save dataset to file"
+            };
+            saveFileDialog.ShowDialog();
+
+            if(saveFileDialog.FileName != "")
+            {
+                _fileReader.WriteInputData(GetExamplesFromTable(), saveFileDialog.FileName);
             }
         }
     }

@@ -12,6 +12,7 @@ namespace NeuralNetwork.Core.DataAccess
         /// <param name="outputIndexes">Indexes of values that are outputs, starting with 0</param>
         /// <returns></returns>
         public Task<TrainingDataset> ReadInputData(string path, int[] outputIndexes);
+        public Task WriteInputData(TrainingDataset dataset, string path);
         public Task<int> GetVariableCount(string path);
     }
 }
