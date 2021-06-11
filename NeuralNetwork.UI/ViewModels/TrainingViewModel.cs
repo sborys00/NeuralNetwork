@@ -40,7 +40,6 @@ namespace NeuralNetwork.UI.ViewModels
                 new SigmoidActivationFunction(),
                 new SigmoidBipolarActivationFunction(),
                 new TanhActivationFunction(),
-                new ReLUActivationFunction()
             };
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateTrainingDataset);
