@@ -24,6 +24,7 @@ namespace NeuralNetwork.UI.ViewModels
             _eventAggregator = eventAggregator;
 
             RedrawNetworkCommand = new DelegateCommand(RedrawNetwork);
+            AddLayerCommand = new DelegateCommand(AddLayer);
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateDataset);
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Subscribe(PublishNetworkUpdate);
@@ -32,18 +33,23 @@ namespace NeuralNetwork.UI.ViewModels
             if (_network == null)
             {
                 AssignDefaultNetwork(_dataset);
+            }
+
+            DrawAndPublish();
+        }
+
+        public Network Network
+        {
+            get => _network;
+            set
+            {
+                _network = value;
                 PublishNetworkUpdate();
             }
-
-            if (Graph == null)
-            {
-                Graph = new BidirectionalGraph<object, IEdge<object>>();
-            }
-
-            DrawNetwork(Graph);
         }
 
         public DelegateCommand RedrawNetworkCommand { get; set; }
+        public DelegateCommand AddLayerCommand { get; set; }
 
         public IGraph<object, IEdge<object>> Graph { get; set; }
         public ObservableCollection<Grid> ManageButtons { get; set; } = new();
@@ -53,7 +59,6 @@ namespace NeuralNetwork.UI.ViewModels
         private List<List<object>> drawnNeurons = new List<List<object>>();
         
         private readonly int neuronSize = 50;
-        private readonly string neuronPropertyIdentificationName = "Name";
 
         private void UpdateDataset(TrainingDataset dataset)
         {
@@ -61,7 +66,7 @@ namespace NeuralNetwork.UI.ViewModels
             NetworkBuilder nb = new();
             var element = _dataset.TrainingExamples.First();
             _network = nb.AddLayers(element.inputValues.Length, element.expectedOutputs.Length).Build();
-            _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Publish(_network);
+            DrawAndPublish();
         }
 
         private void PublishNetworkUpdate()
@@ -81,6 +86,20 @@ namespace NeuralNetwork.UI.ViewModels
                 lastLayerCount = dataset.TrainingExamples.First().expectedOutputs.Length;
             }
             _network = nb.AddLayers(firstLayerCount, 2, 2, 3, lastLayerCount).Build();
+        }
+
+        private void DrawAndPublish()
+        {
+            if (drawnNeurons.Count > 0)
+            {
+                RedrawNetwork();
+            }
+            else
+            {
+                Graph = new BidirectionalGraph<object, IEdge<object>>();
+                DrawNetwork(Graph);
+            }
+            PublishNetworkUpdate();
         }
 
         private void DrawNetwork(IGraph<object, IEdge<object>> graph)
@@ -123,9 +142,13 @@ namespace NeuralNetwork.UI.ViewModels
         private void AddNeuron(int layer)
         {
             _network.AddNeuronToLayer(layer);
-            PublishNetworkUpdate();
-            var graph = (BidirectionalGraph<object, IEdge<object>>)Graph;
-            DrawNeuronOnGraph(graph, layer, _network.Layers[layer].Neurons.Count);
+            DrawAndPublish();
+        }
+
+        private void AddLayer()
+        {
+            _network.InsertHiddenLayer(_network.Layers.Count - 1, 1);
+            DrawAndPublish();
         }
 
         private void RemoveNeuron(int layer)
@@ -137,18 +160,14 @@ namespace NeuralNetwork.UI.ViewModels
             else
             {
                 _network.RemoveNeuronFromLayer(layer);
-                PublishNetworkUpdate();
-                var graph = (BidirectionalGraph<object, IEdge<object>>)Graph;
-                RemoveNeuronFromGraph(graph, layer);
+                DrawAndPublish();
             }
         }
 
         private void RemoveLayer(int layer)
         {
             _network.RemoveHiddenLayer(layer);
-            PublishNetworkUpdate();
-            var graph = (BidirectionalGraph<object, IEdge<object>>)Graph;
-            RemoveLayerFromGraph(graph, layer);
+            DrawAndPublish();
         }
 
         private void DrawNeuronOnGraph(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, int neuronIndex)
@@ -165,7 +184,6 @@ namespace NeuralNetwork.UI.ViewModels
 
             if (layerIndex != 0)
             {
-                //var lastLayerDrawn = GetNeuronsFromLayer<Ellipse>(graph, layerIndex - 1);
                 var lastLayerDrawn = GetLayerDrawn(layerIndex - 1);
                 foreach (var lastLayerNeuronDrawn in lastLayerDrawn)
                 {
@@ -175,7 +193,6 @@ namespace NeuralNetwork.UI.ViewModels
 
             if (layerIndex != _network.Layers.Count - 1 && drawnNeurons.Count > layerIndex + 1)
             {
-                //var nextLayerDrawn = GetNeuronsFromLayer<Ellipse>(graph, layerIndex + 1);
                 var nextLayerDrawn = GetLayerDrawn(layerIndex + 1);
                 foreach (var nextLayerNeuronDrawn in nextLayerDrawn)
                 {
@@ -189,44 +206,11 @@ namespace NeuralNetwork.UI.ViewModels
             drawnNeurons.ElementAt(layerIndex).Add(neuronDrawn);
         }
 
-        private void RemoveNeuronFromGraph(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex)
-        {
-            //var verticleToRemove = GetNeuronFromLayer<Ellipse>(graph, layerIndex);
-            var verticleToRemove = GetLastNeuronFromLayer(layerIndex);
-            graph.RemoveVertex(verticleToRemove);
-            ((List<object>)GetLayerDrawn(layerIndex)).Remove(verticleToRemove);
-        }
-
-        private void RemoveLayerFromGraph(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex)
-        {
-            //var lastLayerDrawn = GetNeuronsFromLayer<Ellipse>(graph, layerIndex - 1);
-            //var nextLayerDrawn = GetNeuronsFromLayer<Ellipse>(graph, layerIndex + 1);
-            //var verticesToRemove = GetNeuronsFromLayer<Ellipse>(graph, layerIndex);
-            var lastLayerDrawn = GetLayerDrawn(layerIndex - 1);
-            var nextLayerDrawn = GetLayerDrawn(layerIndex + 1);
-            var verticesToRemove = GetLayerDrawn(layerIndex);
-            foreach (var vertex in verticesToRemove)
-            {
-                graph.RemoveVertex(vertex);
-            }
-
-            foreach (var vertexLast in lastLayerDrawn)
-            {
-                foreach (var vertexNext in nextLayerDrawn)
-                {
-                    graph.AddEdge(new Edge<object>(vertexLast, vertexNext));
-                }
-            }
-
-            drawnNeurons.RemoveAt(layerIndex);
-            ManageButtons.RemoveAt(layerIndex - 1);
-        }
-
         private void DrawAddButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid)
         {
             Button addButton = new();
             addButton.Name = $"addButton_{layerIndex}";
-            addButton.Width = neuronSize;
+            addButton.Width = neuronSize * 2;
             addButton.Height = neuronSize;
             addButton.Background = new SolidColorBrush { Color = Colors.Green };
             addButton.Content = "+1";
@@ -241,7 +225,7 @@ namespace NeuralNetwork.UI.ViewModels
         {
             Button removeButton = new();
             removeButton.Name = $"removeButton_{layerIndex}";
-            removeButton.Width = neuronSize;
+            removeButton.Width = neuronSize * 2;
             removeButton.Height = neuronSize;
             removeButton.Background = new SolidColorBrush { Color = Colors.Red };
             removeButton.Content = "-1";
@@ -256,7 +240,7 @@ namespace NeuralNetwork.UI.ViewModels
         {
             Button removeLayerButton = new();
             removeLayerButton.Name = $"removeLayerButton_{layerIndex}";
-            removeLayerButton.Width = neuronSize;
+            removeLayerButton.Width = neuronSize * 2;
             removeLayerButton.Height = neuronSize;
             removeLayerButton.Background = new SolidColorBrush { Color = Colors.Red };
             removeLayerButton.Content = "-n";
@@ -267,32 +251,9 @@ namespace NeuralNetwork.UI.ViewModels
             grid.Children.Add(removeLayerButton);
         }
 
-        private List<T> GetNeuronsFromLayer<T>(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex)
-        {
-            var propertyInfo = typeof(T).GetProperty(neuronPropertyIdentificationName);
-            return graph.Vertices.Where(v => (v is T) && propertyInfo
-            .GetValue((T)v, null).ToString()
-            .Split('_')[1] == (layerIndex).ToString())
-            .OfType<T>()
-            .ToList();
-        }
-
         private IEnumerable<object> GetLayerDrawn(int layerIndex)
         {
             return drawnNeurons.ElementAt(layerIndex);
-        }
-
-        private T GetNeuronFromLayer<T>(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex)
-        {
-            var propertyInfo = typeof(T).GetProperty(neuronPropertyIdentificationName);
-            return (T)graph.Vertices.Last(v => (v is T) && propertyInfo
-            .GetValue((T)v, null).ToString()
-            .Split('_')[1] == layerIndex.ToString());
-        }
-
-        private object GetLastNeuronFromLayer(int layerIndex)
-        {
-            return GetLayerDrawn(layerIndex).Last();
         }
     }
 }
