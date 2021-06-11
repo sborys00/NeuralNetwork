@@ -52,8 +52,6 @@ namespace NeuralNetwork.UI.ViewModels
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Publish();
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Publish();
             
-            // for testing
-            CreateDataForTesting(out _network);
         }
         public DelegateCommand TrainForOneEpochCommand { get; set; }
         public DelegateCommand<int?> QuickStepsCommand { get; set; }
@@ -193,32 +191,6 @@ namespace NeuralNetwork.UI.ViewModels
         {
             _network = network;
             InitializeWeights();
-        }
-
-        private void CreateDataForTesting(out INetwork network)
-        {
-            // made for testing, to be removed later on
-
-            _learningManager.ActivationFunction = new SigmoidActivationFunction();
-            _learningManager.LearningRate = 0.1;
-
-            NetworkBuilder nb = new();
-            network = nb.AddLayers(3, 4, 4, 3).Build();
-
-            _learningManager.TrainingSet = new()
-            {
-                new TrainingDataExample(new double[] { 1.0, 0.3, 0.4 }, new double[] { 1.0, 0.0, 0.0 }),
-                new TrainingDataExample(new double[] { 0.2, 0.9, 0.1 }, new double[] { 0.0, 1.0, 0.0 }),
-                new TrainingDataExample(new double[] { 0.0, 0.0, 0.7 }, new double[] { 0.0, 0.0, 1.0 }),
-                new TrainingDataExample(new double[] { 1.0, 0.0, 0.0 }, new double[] { 1.0, 0.0, 0.0 }),
-                new TrainingDataExample(new double[] { 0.0, 1.0, 0.0 }, new double[] { 0.0, 1.0, 0.0 }),
-            };
-            _learningManager.TestSet = new List<TrainingDataExample>
-            {
-                new TrainingDataExample(new double[] { 0.0, 0.0, 1.0 }, new double[] { 0.0, 0.0, 1.0 }),
-                new TrainingDataExample(new double[] { 0.0, 0.5, 0.0 }, new double[] { 0.0, 1.0, 0.0 }),
-                new TrainingDataExample(new double[] { 0.0, 0.0, 0.8 }, new double[] { 0.0, 0.0, 1.0 }),
-            };
         }
 
         private void UpdateClassificationCorrectnessLinePlot(TrainingResult trainingResult)
