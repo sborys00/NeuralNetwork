@@ -34,11 +34,6 @@ namespace NeuralNetwork.UI.ViewModels
                 AssignDefaultNetwork(_dataset);
             }
 
-            if (Graph == null)
-            {
-                Graph = new BidirectionalGraph<object, IEdge<object>>();
-            }
-
             DrawAndPublish();
         }
 
@@ -69,7 +64,7 @@ namespace NeuralNetwork.UI.ViewModels
             NetworkBuilder nb = new();
             var element = _dataset.TrainingExamples.First();
             _network = nb.AddLayers(element.inputValues.Length, element.expectedOutputs.Length).Build();
-            _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Publish(_network);
+            DrawAndPublish();
         }
 
         private void PublishNetworkUpdate()
@@ -93,7 +88,15 @@ namespace NeuralNetwork.UI.ViewModels
 
         private void DrawAndPublish()
         {
-            DrawNetwork(Graph);
+            if (drawnNeurons.Count > 0)
+            {
+                RedrawNetwork();
+            }
+            else
+            {
+                Graph = new BidirectionalGraph<object, IEdge<object>>();
+                DrawNetwork(Graph);
+            }
             PublishNetworkUpdate();
         }
 
@@ -131,7 +134,7 @@ namespace NeuralNetwork.UI.ViewModels
             graph.Clear();
             drawnNeurons.Clear();
             ManageButtons.Clear();
-            DrawAndPublish();
+            DrawNetwork(Graph);
         }
 
         private void AddNeuron(int layer)
