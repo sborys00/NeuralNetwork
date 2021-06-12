@@ -28,20 +28,32 @@
             <ColumnDefinition
                 Width="*"></ColumnDefinition>
             <ColumnDefinition
+                Width="*"></ColumnDefinition>
+            <ColumnDefinition
                 Width="20"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
         <graph:GraphLayout Grid.Column="1"
                            Grid.Row="1"
                            Graph="{Binding Graph}"
-                           LayoutAlgorithmType="{Binding LayoutAlgorithmType}">
+                           LayoutAlgorithmType="{Binding LayoutAlgorithmType}"
+                           AnimationDisablerVertexCount="10">
         </graph:GraphLayout>
 
-        <ItemsControl Grid.Column="2" Grid.Row="1" ItemsSource="{Binding ManageButtons}">
+        <ItemsControl Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="1" ItemsSource="{Binding ManageButtons}">
         </ItemsControl>
 
-        <Button Grid.Column="1" Grid.Row="2" Command="{Binding RedrawNetworkCommand}">Reset Positions</Button>
-        <Button Grid.Column="2" Grid.Row="2" Command="{Binding AddLayerCommand}">Add Layer</Button>
+        <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                Width="*"></ColumnDefinition>
+                <ColumnDefinition
+                Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            
+            <Button Grid.Column="0" Grid.Row="0" Command="{Binding RedrawNetworkCommand}" Content="Reset Positions"></Button>
+            <Button Grid.Column="1" Grid.Row="0" Command="{Binding AddLayerCommand}" Content="Add Layer"></Button>
+        </Grid>
 
     </Grid>
 </UserControl>
