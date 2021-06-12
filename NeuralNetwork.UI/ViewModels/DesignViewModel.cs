@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
+using System;
 
 namespace NeuralNetwork.UI.ViewModels
 {
@@ -208,47 +209,32 @@ namespace NeuralNetwork.UI.ViewModels
 
         private void DrawAddButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid)
         {
-            Button addButton = new();
-            addButton.Name = $"addButton_{layerIndex}";
-            addButton.Width = neuronSize * 2;
-            addButton.Height = neuronSize;
-            addButton.Background = new SolidColorBrush { Color = Colors.Green };
-            addButton.Content = "+1";
-            addButton.Click += delegate { AddNeuron(layerIndex); };
-
-            Grid.SetColumn(addButton, 0);
-            Grid.SetRow(addButton, 0);
-            grid.Children.Add(addButton);
+            DrawButton(graph, layerIndex, grid, 0, "addNeuronButton", "+1", new SolidColorBrush { Color = Colors.Green }, AddNeuron);
         }
 
         private void DrawRemoveButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid)
         {
-            Button removeButton = new();
-            removeButton.Name = $"removeButton_{layerIndex}";
-            removeButton.Width = neuronSize * 2;
-            removeButton.Height = neuronSize;
-            removeButton.Background = new SolidColorBrush { Color = Colors.Red };
-            removeButton.Content = "-1";
-            removeButton.Click += delegate { RemoveNeuron(layerIndex); };
-
-            Grid.SetColumn(removeButton, 1);
-            Grid.SetRow(removeButton, 0);
-            grid.Children.Add(removeButton);
+            DrawButton(graph, layerIndex, grid, 1, "removeNeuronButton", "-1", new SolidColorBrush { Color = Colors.Red }, RemoveNeuron);
         }
 
         private void DrawRemoveLayerButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid)
         {
-            Button removeLayerButton = new();
-            removeLayerButton.Name = $"removeLayerButton_{layerIndex}";
-            removeLayerButton.Width = neuronSize * 2;
-            removeLayerButton.Height = neuronSize;
-            removeLayerButton.Background = new SolidColorBrush { Color = Colors.Red };
-            removeLayerButton.Content = "-n";
-            removeLayerButton.Click += delegate { RemoveLayer(layerIndex); };
+            DrawButton(graph, layerIndex, grid, 2, "removeLayerButton", "-n", new SolidColorBrush { Color = Colors.Red }, RemoveLayer);
+        }
 
-            Grid.SetColumn(removeLayerButton, 2);
-            Grid.SetRow(removeLayerButton, 0);
-            grid.Children.Add(removeLayerButton);
+        private void DrawButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid, int gridPosition, string name, string content, SolidColorBrush brush, Action<int> click)
+        {
+            Button button = new();
+            button.Name = name + $"_{layerIndex}";
+            button.Width = neuronSize * 2;
+            button.Height = neuronSize;
+            button.Background = brush;
+            button.Content = content;
+            button.Click += delegate { click(layerIndex); };
+
+            Grid.SetColumn(button, gridPosition);
+            Grid.SetRow(button, 0);
+            grid.Children.Add(button);
         }
 
         private IEnumerable<object> GetLayerDrawn(int layerIndex)
