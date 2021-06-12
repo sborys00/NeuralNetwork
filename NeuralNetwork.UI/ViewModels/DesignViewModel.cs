@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System;
+using System.Windows;
 
 namespace NeuralNetwork.UI.ViewModels
 {
@@ -119,6 +120,7 @@ namespace NeuralNetwork.UI.ViewModels
                     DrawAddButton(bidirectionalGraph, i, grid);
                     DrawRemoveButton(bidirectionalGraph, i, grid);
                     DrawRemoveLayerButton(bidirectionalGraph, i, grid);
+                    GridOnHoverChangeColor(grid, i, new SolidColorBrush { Color = Colors.Aqua }, new SolidColorBrush { Color = Colors.White });
                     ManageButtons.Add(grid);
                 }
 
@@ -231,10 +233,21 @@ namespace NeuralNetwork.UI.ViewModels
             button.Background = brush;
             button.Content = content;
             button.Click += delegate { click(layerIndex); };
-
+            
             Grid.SetColumn(button, gridPosition);
             Grid.SetRow(button, 0);
             grid.Children.Add(button);
+        }
+
+        private void GridOnHoverChangeColor(Grid grid, int layerIndex, SolidColorBrush brushEnter, SolidColorBrush brushLeave)
+        {
+            grid.MouseEnter += delegate { ChangeLayerColor(layerIndex, brushEnter); };
+            grid.MouseLeave += delegate { ChangeLayerColor(layerIndex, brushLeave); };
+        }
+
+        private void ChangeLayerColor(int layerIndex, SolidColorBrush brush)
+        {
+            drawnNeurons.ElementAt(layerIndex).ForEach(n => ((Shape)n).Fill = brush);
         }
 
         private IEnumerable<object> GetLayerDrawn(int layerIndex)
