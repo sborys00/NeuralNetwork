@@ -1,4 +1,6 @@
-﻿using NeuralNetwork.Core.Models;
+﻿using Microsoft.Win32;
+using NeuralNetwork.Core.DataAccess;
+using NeuralNetwork.Core.Models;
 using NeuralNetwork.UI.Event;
 using OxyPlot;
 using OxyPlot.Axes;
@@ -18,14 +20,15 @@ namespace NeuralNetwork.UI.ViewModels
     {
         private readonly ILearningManager _learningManager;
         private readonly IEventAggregator _eventAggregator;
-        private INetwork _network;
+        private readonly ISaveFileReader _sfr;
+        private Network _network;
 
 
-        public TrainingViewModel(ILearningManager learningManager, INetwork network, IEventAggregator eventAggregator)
+        public TrainingViewModel(ILearningManager learningManager, IEventAggregator eventAggregator, ISaveFileReader sfr)
         {
             _learningManager = learningManager;
-            _network = network;
             _eventAggregator = eventAggregator;
+            _sfr = sfr;
             TrainForOneEpochCommand = new DelegateCommand(TrainForOneEpoch);
             QuickStepsCommand = new DelegateCommand<int?>(TrainForManyEpochs);
             InitializeWeightsCommand = new DelegateCommand(InitializeWeights);
@@ -44,6 +47,7 @@ namespace NeuralNetwork.UI.ViewModels
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateTrainingDataset);
             _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe(UpdateNetwork);
+            _eventAggregator.GetEvent<SaveButtonClickedEvent>().Subscribe(SaveNetwork);
 
             _learningManager.ActivationFunction = new SigmoidActivationFunction();
             _learningManager.LearningRate = 0.1;
@@ -265,6 +269,27 @@ namespace NeuralNetwork.UI.ViewModels
                 Color = OxyColor.FromAColor(opacity, OxyColors.DeepSkyBlue)
             };
             ClassificationCorrectnessLinePlot.Series.Add(_classificationCorrectnessLineSeries);
+        }
+
+        private void SaveNetwork()
+        {
+            SaveFileDialog saveFileDialog = new()
+            {
+                DefaultExt = ".json",
+                Filter = "Json files (*.json)|*.json|All files (*.*)|*.*",
+                Title = "Save network to file"
+            };
+            saveFileDialog.ShowDialog();
+
+            if (saveFileDialog.FileName != "")
+            {
+                Save save = new()
+                {
+                    Network = _network,
+                    TrainingDataset = TrainingDataset
+                };
+                _sfr.WriteSave(saveFileDialog.FileName, save);
+            }
         }
     }
 }

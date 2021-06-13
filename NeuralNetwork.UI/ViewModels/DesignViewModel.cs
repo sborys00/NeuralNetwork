@@ -30,6 +30,11 @@ namespace NeuralNetwork.UI.ViewModels
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateDataset);
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Subscribe(PublishNetworkUpdate);
+            _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe((network) => 
+            {
+                _network = network;
+                RedrawNetwork();
+            });
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Publish();
 
             if (_network == null)
