@@ -37,8 +37,11 @@ namespace NeuralNetwork.UI.ViewModels
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Subscribe(SaveTableData);
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe((dataset) =>
                 {
-                    TrainingDataset = dataset;
-                    DataTable = GenerateDataTable(TrainingDataset);
+                    if(dataset != TrainingDataset)
+                    {
+                        TrainingDataset = dataset;
+                        DataTable = GenerateDataTable(TrainingDataset);
+                    }
                 });
         }
 
@@ -76,8 +79,8 @@ namespace NeuralNetwork.UI.ViewModels
         {
             if (DataTable?.Rows?.Count > 0)
             {
-                TrainingDataset trainingDataset = GetExamplesFromTable();
-                _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Publish(trainingDataset);
+                TrainingDataset = GetExamplesFromTable();
+                _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Publish(TrainingDataset);
             }
         }
 
