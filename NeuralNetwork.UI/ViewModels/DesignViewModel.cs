@@ -27,6 +27,7 @@ namespace NeuralNetwork.UI.ViewModels
 
             RedrawNetworkCommand = new DelegateCommand(RedrawNetwork);
             AddLayerCommand = new DelegateCommand(AddLayer);
+            InitializeWeightsCommand = new DelegateCommand(InitializeWeights);
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateDataset);
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Subscribe(PublishNetworkUpdate);
@@ -52,6 +53,7 @@ namespace NeuralNetwork.UI.ViewModels
 
         public DelegateCommand RedrawNetworkCommand { get; set; }
         public DelegateCommand AddLayerCommand { get; set; }
+        public DelegateCommand InitializeWeightsCommand { get; set; }
 
         public IGraph<object, IEdge<object>> Graph { get; set; }
         public ObservableCollection<Grid> ManageButtons { get; set; } = new();
@@ -88,6 +90,12 @@ namespace NeuralNetwork.UI.ViewModels
                 lastLayerCount = dataset.TrainingExamples.First().expectedOutputs.Length;
             }
             _network = nb.AddLayers(firstLayerCount, 2, 2, 3, lastLayerCount).Build();
+        }
+
+        private void InitializeWeights()
+        {
+            _network.InitializeWeights();
+            DrawAndPublish();
         }
 
         private void DrawAndPublish()
@@ -185,28 +193,71 @@ namespace NeuralNetwork.UI.ViewModels
             neuronDrawn.Fill = colorBrush;
             graph.AddVertex(neuronDrawn);
 
+
             if (layerIndex != 0)
             {
+                List<SolidColorBrush> weightBrushes = NeuronInWeightsToBrush(layerIndex, neuronIndex);
                 var lastLayerDrawn = GetLayerDrawn(layerIndex - 1);
-                foreach (var lastLayerNeuronDrawn in lastLayerDrawn)
+
+                //foreach (var lastLayerNeuronDrawn in lastLayerDrawn)
+                //{
+                //    graph.AddEdge(new ColoredEdge<object>(lastLayerNeuronDrawn, neuronDrawn, new SolidColorBrush { Color = Colors.Green }));
+                //}
+                foreach (var lastLayerNeuronDrawn in lastLayerDrawn.Zip(weightBrushes, (n, b) => new { Neuron = n, Brush = b }))
                 {
-                    graph.AddEdge(new Edge<object>(lastLayerNeuronDrawn, neuronDrawn));
+                    graph.AddEdge(new ColoredEdge<object>(lastLayerNeuronDrawn.Neuron, neuronDrawn, lastLayerNeuronDrawn.Brush));
                 }
             }
 
-            if (layerIndex != _network.Layers.Count - 1 && drawnNeurons.Count > layerIndex + 1)
-            {
-                var nextLayerDrawn = GetLayerDrawn(layerIndex + 1);
-                foreach (var nextLayerNeuronDrawn in nextLayerDrawn)
-                {
-                    graph.AddEdge(new Edge<object>(neuronDrawn, nextLayerNeuronDrawn));
-                }
-            }
+            //if (layerIndex != _network.Layers.Count - 1 && drawnNeurons.Count > layerIndex + 1)
+            //{
+            //    var nextLayerDrawn = GetLayerDrawn(layerIndex + 1);
+            //    foreach (var nextLayerNeuronDrawn in nextLayerDrawn)
+            //    {
+            //        graph.AddEdge(new ColoredEdge<object>(neuronDrawn, nextLayerNeuronDrawn, new SolidColorBrush { Color = Colors.Green }));
+            //    }
+            //}
 
             if (drawnNeurons.Count <= layerIndex)
                 drawnNeurons.Add(new List<object>());
 
             drawnNeurons.ElementAt(layerIndex).Add(neuronDrawn);
+        }
+
+        private List<SolidColorBrush> NeuronInWeightsToBrush(int layerIndex, int neuronIndex)
+        {
+            _network.CalculateWeightBoundsForLayer(layerIndex - 1, out double upperBound, out double lowerBound);
+            List<SolidColorBrush> brushes = new(_network.Layers[layerIndex - 1].Neurons.Count);
+            int i = 0;
+            foreach (var neuron in _network.Layers[layerIndex - 1].Neurons)
+            {
+                if (neuron.Weights[neuronIndex] < lowerBound || neuron.Weights[neuronIndex] > upperBound)
+                    throw new Exception($"Weight {neuronIndex} of neuron {i} at layer {layerIndex - 1} has weight that exceeds bounds");
+
+                brushes.Add(WeightToBrush(neuron.Weights[neuronIndex], upperBound, lowerBound));
+                i++;
+            }
+            return brushes;
+        }
+
+        private List<SolidColorBrush> NeuronWeightsToBrush(int layerIndex, int neuronIndex)
+        {
+            _network.CalculateWeightBoundsForLayer(layerIndex, out double upperBound, out double lowerBound);
+            List<SolidColorBrush> brushes = new(_network.Layers[layerIndex].Neurons.Count);
+            foreach (var weight in _network.Layers[layerIndex].Neurons[neuronIndex].Weights)
+            {
+                brushes.Add(WeightToBrush(weight, upperBound, lowerBound));
+            }
+            return brushes;
+        }
+
+        private SolidColorBrush WeightToBrush(double weight, double upperBound, double lowerBound)
+        {
+            var x = (weight + Math.Abs(lowerBound)) * 511 / (upperBound - lowerBound);
+            if (x > 255)
+                return new SolidColorBrush { Color = Color.FromRgb(0, Convert.ToByte(x - 255), 0) };
+            else
+                return new SolidColorBrush { Color = Color.FromRgb(Convert.ToByte(x), 0, 0) };
         }
 
         private void DrawAddButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid)
