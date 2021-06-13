@@ -258,7 +258,7 @@ namespace NeuralNetwork.UI.ViewModels
 
         private SolidColorBrush WeightToBrush(double weight, double upperBound, double lowerBound)
         {
-            var x = (weight + Math.Abs(lowerBound)) * 511 / (upperBound - lowerBound);
+            var x = (weight + Math.Abs(lowerBound)) * 510 / (upperBound - lowerBound);
             if (x > 255)
                 return new SolidColorBrush { Color = Color.FromRgb(0, Convert.ToByte(x - 255), 0) };
             else
