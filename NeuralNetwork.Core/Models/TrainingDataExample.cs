@@ -11,13 +11,13 @@ namespace NeuralNetwork.Core.Models
     /// </summary>
     public class TrainingDataExample
     {
-        public readonly double[] inputValues;
-        public readonly double[] expectedOutputs;
+        public double[] InputValues { get;}
+        public double[] ExpectedOutputs { get;}
 
-        public TrainingDataExample(double[] inputValues, double[] expectedOutput)
+        public TrainingDataExample(double[] InputValues, double[] ExpectedOutputs)
         {
-            this.inputValues = inputValues;
-            this.expectedOutputs = expectedOutput;
+            this.InputValues = InputValues;
+            this.ExpectedOutputs = ExpectedOutputs;
         }
     }
 }

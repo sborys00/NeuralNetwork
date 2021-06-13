@@ -110,8 +110,8 @@ namespace NeuralNetwork.UI.ViewModels
             DataTable dataTable = new();
             List<TrainingDataExample> dataset = trainingDataset.TrainingExamples.ToList();
             dataset.AddRange(trainingDataset.TestExamples);
-            int inputCount = dataset[0].inputValues.Length;
-            int outputCount = dataset[0].expectedOutputs.Length;
+            int inputCount = dataset[0].InputValues.Length;
+            int outputCount = dataset[0].ExpectedOutputs.Length;
 
             dataTable.Columns.Add(new DataColumn() { ColumnName = $"Test", DataType = typeof(bool) });
             for (int i = 0; i < trainingDataset.VariableNames.Count(); i++)
@@ -127,9 +127,9 @@ namespace NeuralNetwork.UI.ViewModels
                 for (j = 0; j < inputCount + outputCount;  j++)
                 {
                     if(j < inputCount)
-                        row[j + 1] = dataset[i].inputValues[j];
+                        row[j + 1] = dataset[i].InputValues[j];
                     else
-                        row[j + 1] = dataset[i].expectedOutputs[j - inputCount];
+                        row[j + 1] = dataset[i].ExpectedOutputs[j - inputCount];
                 }
                 dataTable.Rows.Add(row);
             }
@@ -141,7 +141,7 @@ namespace NeuralNetwork.UI.ViewModels
             List<TrainingDataExample> trainingExamples = new();
             List<TrainingDataExample> testExamples = new();
             List<string> variableNames = new();
-            int inputCount = TrainingDataset.TrainingExamples.First().inputValues.Length;
+            int inputCount = TrainingDataset.TrainingExamples.First().InputValues.Length;
             foreach (DataColumn col in DataTable.Columns)
             {
                 //skip first column

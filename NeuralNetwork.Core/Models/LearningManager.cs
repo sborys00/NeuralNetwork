@@ -43,19 +43,19 @@ namespace NeuralNetwork.Core.Models
         /// <returns></returns>
         public TestResult RunOneExample(INetwork network, TrainingDataExample example)
         {
-            var (outputs, inputs) = network.CalculateOutput(example.inputValues, this.ActivationFunction.Function);
+            var (outputs, inputs) = network.CalculateOutput(example.InputValues, this.ActivationFunction.Function);
             var lastLayer = outputs.Last();
-            if (lastLayer.Count != example.expectedOutputs.Length)
+            if (lastLayer.Count != example.ExpectedOutputs.Length)
                 throw new Exception("Number of outputs does not match example data");
 
-            int len = example.expectedOutputs.Length;
+            int len = example.ExpectedOutputs.Length;
 
             double[] expected = new double[len];
             double[] actual = new double[len];
 
             for (int i = 0; i < len; i++)
             {
-                expected[i] = example.expectedOutputs[i];
+                expected[i] = example.ExpectedOutputs[i];
                 actual[i] = lastLayer[i];
             }
             return new TestResult(expected, actual, outputs, inputs);
