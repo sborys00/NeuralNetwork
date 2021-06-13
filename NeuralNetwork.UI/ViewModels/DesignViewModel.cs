@@ -21,6 +21,8 @@ namespace NeuralNetwork.UI.ViewModels
     {
         private readonly IEventAggregator _eventAggregator;
 
+        private readonly int neuronSize = 50;
+
         public DesignViewModel(IEventAggregator eventAggregator)
         {
             _eventAggregator = eventAggregator;
@@ -33,24 +35,13 @@ namespace NeuralNetwork.UI.ViewModels
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Subscribe(PublishNetworkUpdate);
             _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe((network) => 
             {
-                _network = network;
-                RedrawNetwork();
+                Network = network;
             });
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Publish();
 
             if (_network == null)
             {
-                AssignDefaultNetwork(_dataset);
-            }
-        }
-
-        public Network Network
-        {
-            get => _network;
-            set
-            {
-                _network = value;
-                PublishNetworkUpdate();
+                AssignDefaultNetwork(Dataset);
             }
         }
 
@@ -60,18 +51,41 @@ namespace NeuralNetwork.UI.ViewModels
 
         public IGraph<object, IEdge<object>> Graph { get; set; }
         public ObservableCollection<Grid> ManageButtons { get; set; } = new();
-        public string LayoutAlgorithmType { get; set; }
+
         private Network _network;
+        public Network Network
+        {
+            get => _network;
+            set
+            {
+                if(_network != value)
+                {
+                    _network = value;
+                    RedrawNetwork();
+                    PublishNetworkUpdate();
+                }
+            }
+        }
         private TrainingDataset _dataset;
+
+        public TrainingDataset Dataset
+        {
+            get => _dataset;
+            set
+            {
+                _dataset = value;
+            }
+        }
+
+        public string LayoutAlgorithmType { get; set; }
         private List<List<object>> drawnNeurons = new List<List<object>>();
         
-        private readonly int neuronSize = 50;
 
         private void UpdateDataset(TrainingDataset dataset)
         {
-            _dataset = dataset;
+            Dataset = dataset;
             NetworkBuilder nb = new();
-            var element = _dataset.TrainingExamples.First();
+            var element = Dataset.TrainingExamples.First();
             Network = nb.AddLayers(element.InputValues.Length, element.ExpectedOutputs.Length).Build();
         }
 
@@ -96,9 +110,8 @@ namespace NeuralNetwork.UI.ViewModels
 
         private void InitializeWeights()
         {
-            Network network = _network;
-            network.InitializeWeights();
-            Network = network;
+            Network.InitializeWeights();
+            RedrawNetwork();
         }
 
         private void DrawNetwork(IGraph<object, IEdge<object>> graph)
@@ -145,16 +158,14 @@ namespace NeuralNetwork.UI.ViewModels
 
         private void AddNeuron(int layer)
         {
-            Network network = Network;
-            network.AddNeuronToLayer(layer);
-            Network = network;
+            Network.AddNeuronToLayer(layer);
+            RedrawNetwork();
         }
 
         private void AddLayer()
         {
-            Network network = Network;
-            network.InsertHiddenLayer(Network.Layers.Count - 1, 1);
-            Network = network;
+            Network.InsertHiddenLayer(Network.Layers.Count - 1, 1);
+            RedrawNetwork();
         }
 
         private void RemoveNeuron(int layer)
@@ -165,17 +176,15 @@ namespace NeuralNetwork.UI.ViewModels
             }
             else
             {
-                Network network = Network;
-                network.RemoveNeuronFromLayer(layer);
-                Network = network;
+                Network.RemoveNeuronFromLayer(layer);
+                RedrawNetwork();
             }
         }
 
         private void RemoveLayer(int layer)
         {
-            Network network = Network;
-            network.RemoveHiddenLayer(layer);
-            Network = network;
+            Network.RemoveHiddenLayer(layer);
+            RedrawNetwork();
         }
 
         private void DrawNeuronOnGraph(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, int neuronIndex)
