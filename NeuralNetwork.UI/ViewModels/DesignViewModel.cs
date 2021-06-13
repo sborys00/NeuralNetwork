@@ -35,7 +35,8 @@ namespace NeuralNetwork.UI.ViewModels
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Subscribe(PublishNetworkUpdate);
             _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe((network) => 
             {
-                Network = network;
+                if(network != Network)
+                    Network = network;
             });
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Publish();
 
@@ -74,6 +75,9 @@ namespace NeuralNetwork.UI.ViewModels
             set
             {
                 _dataset = value;
+                NetworkBuilder nb = new();
+                var element = Dataset.TrainingExamples.First();
+                Network = nb.AddLayers(element.InputValues.Length, element.ExpectedOutputs.Length).Build();
             }
         }
 
@@ -84,9 +88,6 @@ namespace NeuralNetwork.UI.ViewModels
         private void UpdateDataset(TrainingDataset dataset)
         {
             Dataset = dataset;
-            NetworkBuilder nb = new();
-            var element = Dataset.TrainingExamples.First();
-            Network = nb.AddLayers(element.InputValues.Length, element.ExpectedOutputs.Length).Build();
         }
 
         private void PublishNetworkUpdate()
@@ -145,15 +146,11 @@ namespace NeuralNetwork.UI.ViewModels
 
         private void RedrawNetwork()
         {
-            if (Graph == null)
-            {
-                Graph = new BidirectionalGraph<object, IEdge<object>>();
-            }
-            var graph = (BidirectionalGraph<object, IEdge<object>>)Graph;
-            graph.Clear();
+            Graph = new BidirectionalGraph<object, IEdge<object>>();
             drawnNeurons.Clear();
             ManageButtons.Clear();
             DrawNetwork(Graph);
+            RaisePropertyChanged(nameof(Graph));
         }
 
         private void AddNeuron(int layer)
