@@ -146,7 +146,15 @@ namespace NeuralNetwork.Core.Models
             outputHistory.Add(input.ToList());
             return (outputHistory, inputHistory);
         }
-        
+
+        public void CalculateWeightBoundsForLayer(int index, out double upperBound, out double lowerBound)
+        {
+            int currentLayerNodeAmount = Layers[index].Neurons.Count;
+            int nextLayerNodeAmount = Layers[index + 1].Neurons.Count;
+
+            CalculateWeightBounds(currentLayerNodeAmount, nextLayerNodeAmount, out upperBound, out lowerBound);
+        }
+
         private void InitializeWeightsForLayer(int index)
         {
             if (index < 0)
@@ -173,16 +181,7 @@ namespace NeuralNetwork.Core.Models
             }
         }
 
-        private void CalculateWeightBoundsForLayer(int index, out double upperBound, out double lowerBound)
-        {
-            int lastLayerNodeAmount = 0;
-            if (index != 0)
-                lastLayerNodeAmount = Layers[index - 1].Neurons.Count;
-
-            int nextLayerNodeAmount = Layers[index + 1].Neurons.Count;
-
-            CalculateWeightBounds(lastLayerNodeAmount, nextLayerNodeAmount, out upperBound, out lowerBound);
-        }
+        
 
         private void CalculateWeightBounds(int lastLayerNodeAmount, int nextLayerNodeAmount, out double upperBound, out double lowerBound)
         {

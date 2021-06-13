@@ -15,6 +15,7 @@ namespace NeuralNetwork.Core.Models
         public void AddNeuronToLayer(int index);
         public void RemoveNeuronFromLayer(int index);
         public void InitializeWeights();
+        public void CalculateWeightBoundsForLayer(int index, out double upperBound, out double lowerBound);
         public (List<List<double>> outputs, List<List<double>> inputs) CalculateOutput(double[] input, Func<double, double> activationFunction);
     }
 }
