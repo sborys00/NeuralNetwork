@@ -90,8 +90,8 @@ namespace NeuralNetwork.Core.DataAccess
         private string ConvertExampleToString(TrainingDataExample example)
         {
             CultureInfo culture = new("en-US");
-            string[] inputs = example.inputValues.Select(n => n.ToString(culture)).ToArray();
-            string[] outputs = example.expectedOutputs.Select(n => n.ToString(culture)).ToArray();
+            string[] inputs = example.InputValues.Select(n => n.ToString(culture)).ToArray();
+            string[] outputs = example.ExpectedOutputs.Select(n => n.ToString(culture)).ToArray();
             string content = string.Join(',', inputs) + "," + string.Join(',', outputs);
             return content;
         }

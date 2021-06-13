@@ -8,8 +8,8 @@ namespace NeuralNetwork.Core.Models
 {
     public class TrainingDataset
     {
-        public IEnumerable<string> VariableNames;
-        public IEnumerable<TrainingDataExample> TrainingExamples; 
-        public IEnumerable<TrainingDataExample> TestExamples; 
+        public IEnumerable<string> VariableNames { get; set; }
+        public IEnumerable<TrainingDataExample> TrainingExamples { get; set; }
+        public IEnumerable<TrainingDataExample> TestExamples { get; set; }
     }
 }

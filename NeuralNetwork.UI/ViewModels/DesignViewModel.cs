@@ -31,6 +31,11 @@ namespace NeuralNetwork.UI.ViewModels
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateDataset);
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Subscribe(PublishNetworkUpdate);
+            _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe((network) => 
+            {
+                _network = network;
+                RedrawNetwork();
+            });
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Publish();
 
             if (_network == null)
@@ -69,7 +74,7 @@ namespace NeuralNetwork.UI.ViewModels
             _dataset = dataset;
             NetworkBuilder nb = new();
             var element = _dataset.TrainingExamples.First();
-            _network = nb.AddLayers(element.inputValues.Length, element.expectedOutputs.Length).Build();
+            _network = nb.AddLayers(element.InputValues.Length, element.ExpectedOutputs.Length).Build();
             DrawAndPublish();
         }
 
@@ -86,8 +91,8 @@ namespace NeuralNetwork.UI.ViewModels
             int lastLayerCount = 2;
             if (dataset != null)
             {
-                firstLayerCount = dataset.TrainingExamples.First().inputValues.Length;
-                lastLayerCount = dataset.TrainingExamples.First().expectedOutputs.Length;
+                firstLayerCount = dataset.TrainingExamples.First().InputValues.Length;
+                lastLayerCount = dataset.TrainingExamples.First().ExpectedOutputs.Length;
             }
             _network = nb.AddLayers(firstLayerCount, 2, 2, 3, lastLayerCount).Build();
         }

@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="GraphShape" Version="1.2.0" />
     <PackageReference Include="GraphShape.Controls" Version="1.2.0" />
-    <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
     <PackageReference Include="MaterialDesignColors" Version="2.0.1" />
     <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
     <PackageReference Include="OxyPlot.Wpf" Version="2.0.0" />

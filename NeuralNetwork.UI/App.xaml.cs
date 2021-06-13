@@ -29,6 +29,7 @@ namespace NeuralNetwork.UI
             containerRegistry.Register<IFileReader, CSVReader>();
             containerRegistry.Register<ILearningManager, LearningManager>();
             containerRegistry.Register<INetwork, Network>();
+            containerRegistry.Register<ISaveFileReader, SaveFileReader>();
 
             containerRegistry.RegisterForNavigation<HomeView>();
             containerRegistry.RegisterForNavigation<DesignView>();

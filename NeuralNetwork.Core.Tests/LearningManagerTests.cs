@@ -1,5 +1,7 @@
 ﻿using NeuralNetwork.Core.Models;
 using System;
+using System.Collections.Generic;
+using System.Text.Json;
 using Xunit;
 
 namespace NeuralNetwork.Core.Tests
@@ -86,6 +88,8 @@ namespace NeuralNetwork.Core.Tests
                     new double[] { 0.0, 0.0, 1.0 }
                     ),
             };
+            string text = JsonSerializer.Serialize(learningManager.TrainingSet);
+            learningManager.TrainingSet = JsonSerializer.Deserialize<List<TrainingDataExample>>(text);
             double avgError = 1;
             for (int i = 0; i < 5; i++)
             {

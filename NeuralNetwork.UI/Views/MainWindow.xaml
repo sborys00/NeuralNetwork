@@ -137,10 +137,34 @@
                             </Button>
                             <Button
                                 Name="TrainingButton"
-                                Command="{Binding NavigateCommand}" 
+                                Command="{Binding NavigateCommand}"
                                 CommandParameter="TrainingView">
                                 Training
                             </Button>
+                            <WrapPanel
+                                HorizontalAlignment="Center"
+                                Margin="0 15 0 15">
+                                <Button
+                                    Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                    ToolTip="Load Network"
+                                    Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"
+                                    Margin="10 0 10 0"
+                                    Name="LoadButton"
+                                    Command="{Binding LoadCommand}">
+                                    <materialDesign:PackIcon
+                                        Kind="FileDownloadOutline" />
+                                </Button>
+                                <Button
+                                    Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                    ToolTip="Save Network"
+                                    Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"
+                                    Margin="10 0 10 0"
+                                    Name="SaveButton"
+                                    Command="{Binding SaveCommand}">
+                                    <materialDesign:PackIcon
+                                        Kind="ContentSave" />
+                                </Button>
+                            </WrapPanel>
                         </StackPanel>
                     </DockPanel>
                 </materialDesign:DrawerHost.LeftDrawerContent>
@@ -157,9 +181,6 @@
                                 Cursor="Hand"
                                 Style="{StaticResource MaterialDesignHamburgerToggleButton}"
                                 AutomationProperties.Name="HamburgerToggleButton" />
-                            <StackPanel
-                                Orientation="Horizontal">
-                            </StackPanel>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"

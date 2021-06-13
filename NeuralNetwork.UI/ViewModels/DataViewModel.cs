@@ -35,6 +35,11 @@ namespace NeuralNetwork.UI.ViewModels
             SaveToFileCommand = new DelegateCommand(SaveToFile);
 
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Subscribe(SaveTableData);
+            _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe((dataset) =>
+                {
+                    TrainingDataset = dataset;
+                    DataTable = GenerateDataTable(TrainingDataset);
+                });
         }
 
         public DelegateCommand LoadFileCommand { get; set; }
@@ -69,7 +74,7 @@ namespace NeuralNetwork.UI.ViewModels
 
         public void SaveTableData()
         {
-            if(DataTable?.Rows?.Count > 0)
+            if (DataTable?.Rows?.Count > 0)
             {
                 TrainingDataset trainingDataset = GetExamplesFromTable();
                 _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Publish(trainingDataset);
@@ -95,7 +100,7 @@ namespace NeuralNetwork.UI.ViewModels
         {
             string message = message = $"Enter variable names and specify outputs";
             string[] names = Array.Empty<string>();
-            bool[] outputs = Array.Empty<bool>(); 
+            bool[] outputs = Array.Empty<bool>();
             _dialogService.ShowDialog("DataPickerDialogView", new DialogParameters { { "message", message }, { "count", variableCount } },
                 r =>
                 {
@@ -110,13 +115,13 @@ namespace NeuralNetwork.UI.ViewModels
             DataTable dataTable = new();
             List<TrainingDataExample> dataset = trainingDataset.TrainingExamples.ToList();
             dataset.AddRange(trainingDataset.TestExamples);
-            int inputCount = dataset[0].inputValues.Length;
-            int outputCount = dataset[0].expectedOutputs.Length;
+            int inputCount = dataset[0].InputValues.Length;
+            int outputCount = dataset[0].ExpectedOutputs.Length;
 
             dataTable.Columns.Add(new DataColumn() { ColumnName = $"Test", DataType = typeof(bool) });
             for (int i = 0; i < trainingDataset.VariableNames.Count(); i++)
             {
-                    dataTable.Columns.Add(new DataColumn() { ColumnName = trainingDataset.VariableNames.ElementAt(i), DataType = typeof(double) });
+                dataTable.Columns.Add(new DataColumn() { ColumnName = trainingDataset.VariableNames.ElementAt(i), DataType = typeof(double) });
             }
 
             for (int i = 0; i < dataset.Count; i++)
@@ -124,12 +129,12 @@ namespace NeuralNetwork.UI.ViewModels
                 DataRow row = dataTable.NewRow();
                 row[0] = false;
                 int j;
-                for (j = 0; j < inputCount + outputCount;  j++)
+                for (j = 0; j < inputCount + outputCount; j++)
                 {
-                    if(j < inputCount)
-                        row[j + 1] = dataset[i].inputValues[j];
+                    if (j < inputCount)
+                        row[j + 1] = dataset[i].InputValues[j];
                     else
-                        row[j + 1] = dataset[i].expectedOutputs[j - inputCount];
+                        row[j + 1] = dataset[i].ExpectedOutputs[j - inputCount];
                 }
                 dataTable.Rows.Add(row);
             }
@@ -141,7 +146,7 @@ namespace NeuralNetwork.UI.ViewModels
             List<TrainingDataExample> trainingExamples = new();
             List<TrainingDataExample> testExamples = new();
             List<string> variableNames = new();
-            int inputCount = TrainingDataset.TrainingExamples.First().inputValues.Length;
+            int inputCount = TrainingDataset.TrainingExamples.First().InputValues.Length;
             foreach (DataColumn col in DataTable.Columns)
             {
                 //skip first column
@@ -150,9 +155,9 @@ namespace NeuralNetwork.UI.ViewModels
 
                 variableNames.Add(col.ColumnName);
             }
-            foreach(DataRow row in DataTable.Rows)
+            foreach (DataRow row in DataTable.Rows)
             {
-                double[] values = new double[row.ItemArray.Length-1];
+                double[] values = new double[row.ItemArray.Length - 1];
                 for (int i = 1; i < row.ItemArray.Length; i++)
                 {
                     try
@@ -188,7 +193,7 @@ namespace NeuralNetwork.UI.ViewModels
             {
                 indexes.Add(random.Next(0, dataTable.Rows.Count));
             }
-            foreach(int i in indexes)
+            foreach (int i in indexes)
             {
                 DataTable.Rows[i].SetField<bool>(0, true);
             }
@@ -196,7 +201,7 @@ namespace NeuralNetwork.UI.ViewModels
 
         private void UnsetAllTestExamples()
         {
-            foreach(DataRow row in DataTable.Rows)
+            foreach (DataRow row in DataTable.Rows)
             {
                 row.SetField<bool>(0, false);
             }
@@ -204,7 +209,7 @@ namespace NeuralNetwork.UI.ViewModels
 
         private void SaveToFile()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog()
+            SaveFileDialog saveFileDialog = new()
             {
                 DefaultExt = ".csv",
                 Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
@@ -212,7 +217,7 @@ namespace NeuralNetwork.UI.ViewModels
             };
             saveFileDialog.ShowDialog();
 
-            if(saveFileDialog.FileName != "")
+            if (saveFileDialog.FileName != "")
             {
                 _fileReader.WriteInputData(GetExamplesFromTable(), saveFileDialog.FileName);
             }
