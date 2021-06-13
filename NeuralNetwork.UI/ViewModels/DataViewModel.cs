@@ -63,6 +63,9 @@ namespace NeuralNetwork.UI.ViewModels
         public async void LoadFile()
         {
             string fileName = SelectDataFile();
+            if (fileName.Length == 0)
+                return;
+
             (string[] names, bool[] outputs) = SelectOutputsAndVariableNames(await _fileReader.GetVariableCount(fileName));
             List<int> outputIndexes = new();
             for (int i = 0; i < outputs.Length; i++)
@@ -96,7 +99,7 @@ namespace NeuralNetwork.UI.ViewModels
             {
                 return dialog.FileName;
             }
-            throw new FileNotFoundException("File could not be loaded");
+            return "";
         }
 
         private (string[] names, bool[] outputs) SelectOutputsAndVariableNames(int variableCount)
@@ -130,7 +133,10 @@ namespace NeuralNetwork.UI.ViewModels
             for (int i = 0; i < dataset.Count; i++)
             {
                 DataRow row = dataTable.NewRow();
-                row[0] = false;
+                if (i < trainingDataset.TrainingExamples.Count())
+                    row[0] = false;
+                else
+                    row[0] = true;
                 int j;
                 for (j = 0; j < inputCount + outputCount; j++)
                 {
