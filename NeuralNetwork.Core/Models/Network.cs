@@ -155,6 +155,20 @@ namespace NeuralNetwork.Core.Models
             CalculateWeightBounds(currentLayerNodeAmount, nextLayerNodeAmount, out upperBound, out lowerBound);
         }
 
+        public double GetMaximumWeight()
+        {
+            double max = Layers[0].Neurons[0].Weights[0];
+            Layers.ForEach(l => l.Neurons.ForEach(n => { if (n.Weights != null) n.Weights.ForEach(w => { if (w > max) max = w; }); }));
+            return max;
+        }
+
+        public double GetMinimumWeight()
+        {
+            double min = Layers[0].Neurons[0].Weights[0];
+            Layers.ForEach(l => l.Neurons.ForEach(n => { if (n.Weights != null) n.Weights.ForEach(w => { if (w < min) min = w; }); }));
+            return min;
+        }
+
         private void InitializeWeightsForLayer(int index)
         {
             if (index < 0)
