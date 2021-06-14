@@ -39,6 +39,7 @@ namespace NeuralNetwork.UI.ViewModels
                 if (network != Network)
                     Network = network;
             });
+            _eventAggregator.GetEvent<RequestGraphRedrawEvent>().Subscribe(() => RedrawNetwork());
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Publish();
 
             if (_network == null)

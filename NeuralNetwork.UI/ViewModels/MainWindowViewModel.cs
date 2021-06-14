@@ -52,6 +52,10 @@ namespace NeuralNetwork.UI.ViewModels
         public void Navigate(string view)
         {
             _regionManager.RequestNavigate("ContentRegion", view);
+            if(view == "DesignView")
+            {
+                _eventAggregator.GetEvent<RequestGraphRedrawEvent>().Publish();
+            }
         }
 
         public void CloseWindow(Window window)
