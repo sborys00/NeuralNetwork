@@ -119,6 +119,8 @@ namespace NeuralNetwork.UI.ViewModels
         private void DrawNetwork(IGraph<object, IEdge<object>> graph)
         {
             var bidirectionalGraph = (BidirectionalGraph<object, IEdge<object>>)graph;
+            double maxValue = GetMaxWeight();
+            double minValue = GetMinWeight();
             for (int i = 0; i < Network.Layers.Count; i++)
             {
                 if (i > 0 && i < Network.Layers.Count - 1)
@@ -138,7 +140,7 @@ namespace NeuralNetwork.UI.ViewModels
 
                 for (int j = 0; j < Network.Layers[i].Neurons.Count; j++)
                 {
-                    DrawNeuronOnGraph(bidirectionalGraph, i, j);
+                    DrawNeuronOnGraph(bidirectionalGraph, i, j, maxValue, minValue);
                 }
             }
 
@@ -185,7 +187,7 @@ namespace NeuralNetwork.UI.ViewModels
             RedrawNetwork();
         }
 
-        private void DrawNeuronOnGraph(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, int neuronIndex)
+        private void DrawNeuronOnGraph(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, int neuronIndex, double maxValue, double minValue)
         {
             SolidColorBrush colorBrush = new();
             colorBrush.Color = Colors.White;
@@ -198,16 +200,16 @@ namespace NeuralNetwork.UI.ViewModels
             graph.AddVertex(neuronDrawn);
 
 
-            //if (layerIndex != 0)
-            //{
-            //    List<SolidColorBrush> weightBrushes = NeuronInWeightsToBrush(layerIndex, neuronIndex);
-            //    var lastLayerDrawn = GetLayerDrawn(layerIndex - 1);
-
-            //    foreach (var lastLayerNeuronDrawn in lastLayerDrawn.Zip(weightBrushes, (n, b) => new { Neuron = n, Brush = b }))
-            //    {
-            //        graph.AddEdge(new ColoredEdge<object>(lastLayerNeuronDrawn.Neuron, neuronDrawn, lastLayerNeuronDrawn.Brush));
-            //    }
-            //}
+            if (layerIndex != 0)
+            {
+                List<SolidColorBrush> weightBrushes = NeuronInWeightsToBrush(layerIndex, neuronIndex, maxValue, minValue);
+                var lastLayerDrawn = GetLayerDrawn(layerIndex - 1);
+            
+                foreach (var lastLayerNeuronDrawn in lastLayerDrawn.Zip(weightBrushes, (n, b) => new { Neuron = n, Brush = b }))
+                {
+                    graph.AddEdge(new ColoredEdge<object>(lastLayerNeuronDrawn.Neuron, neuronDrawn, lastLayerNeuronDrawn.Brush));
+                }
+            }
 
             if (drawnNeurons.Count <= layerIndex)
                 drawnNeurons.Add(new List<object>());
@@ -215,9 +217,18 @@ namespace NeuralNetwork.UI.ViewModels
             drawnNeurons.ElementAt(layerIndex).Add(neuronDrawn);
         }
 
-        private List<SolidColorBrush> NeuronInWeightsToBrush(int layerIndex, int neuronIndex)
+        private double GetMaxWeight()
         {
-            _network.CalculateWeightBoundsForLayer(layerIndex - 1, out double upperBound, out double lowerBound);
+            return Network.GetMaximumWeight();
+        }
+
+        private double GetMinWeight()
+        {
+            return Network.GetMinimumWeight();
+        }
+
+        private List<SolidColorBrush> NeuronInWeightsToBrush(int layerIndex, int neuronIndex, double upperBound, double lowerBound)
+        {
             List<SolidColorBrush> brushes = new(_network.Layers[layerIndex - 1].Neurons.Count);
             int i = 0;
             foreach (var neuron in _network.Layers[layerIndex - 1].Neurons)
@@ -233,7 +244,14 @@ namespace NeuralNetwork.UI.ViewModels
 
         private SolidColorBrush WeightToBrush(double weight, double upperBound, double lowerBound)
         {
-            var x = (weight + Math.Abs(lowerBound)) * 510 / (upperBound - lowerBound);
+            if (lowerBound > upperBound)
+                throw new Exception("Minimal weight is higher than maximal one");
+
+            if (upperBound == 0 && lowerBound == 0)
+                return new SolidColorBrush { Color = Color.FromRgb(0, 0, 0) };
+
+            var x = (weight - lowerBound) * 510 / (upperBound - lowerBound);
+
             if (x > 255)
                 return new SolidColorBrush { Color = Color.FromRgb(0, Convert.ToByte(x - 255), 0) };
             else
