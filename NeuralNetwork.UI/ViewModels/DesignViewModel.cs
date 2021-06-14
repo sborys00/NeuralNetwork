@@ -34,9 +34,9 @@ namespace NeuralNetwork.UI.ViewModels
 
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateDataset);
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Subscribe(PublishNetworkUpdate);
-            _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe((network) => 
+            _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe((network) =>
             {
-                if(network != Network)
+                if (network != Network)
                     Network = network;
             });
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Publish();
@@ -60,7 +60,7 @@ namespace NeuralNetwork.UI.ViewModels
             get => _network;
             set
             {
-                if(_network != value)
+                if (_network != value)
                 {
                     _network = value;
                     RedrawNetwork();
@@ -84,7 +84,7 @@ namespace NeuralNetwork.UI.ViewModels
 
         public string LayoutAlgorithmType { get; set; }
         private List<List<object>> drawnNeurons = new List<List<object>>();
-        
+
 
         private void UpdateDataset(TrainingDataset dataset)
         {
@@ -99,7 +99,7 @@ namespace NeuralNetwork.UI.ViewModels
         private void AssignDefaultNetwork(TrainingDataset dataset)
         {
             NetworkBuilder nb = new();
-            
+
             int firstLayerCount = 2;
             int lastLayerCount = 2;
             if (dataset != null)
@@ -198,16 +198,16 @@ namespace NeuralNetwork.UI.ViewModels
             graph.AddVertex(neuronDrawn);
 
 
-            if (layerIndex != 0)
-            {
-                List<SolidColorBrush> weightBrushes = NeuronInWeightsToBrush(layerIndex, neuronIndex);
-                var lastLayerDrawn = GetLayerDrawn(layerIndex - 1);
+            //if (layerIndex != 0)
+            //{
+            //    List<SolidColorBrush> weightBrushes = NeuronInWeightsToBrush(layerIndex, neuronIndex);
+            //    var lastLayerDrawn = GetLayerDrawn(layerIndex - 1);
 
-                foreach (var lastLayerNeuronDrawn in lastLayerDrawn.Zip(weightBrushes, (n, b) => new { Neuron = n, Brush = b }))
-                {
-                    graph.AddEdge(new ColoredEdge<object>(lastLayerNeuronDrawn.Neuron, neuronDrawn, lastLayerNeuronDrawn.Brush));
-                }
-            }
+            //    foreach (var lastLayerNeuronDrawn in lastLayerDrawn.Zip(weightBrushes, (n, b) => new { Neuron = n, Brush = b }))
+            //    {
+            //        graph.AddEdge(new ColoredEdge<object>(lastLayerNeuronDrawn.Neuron, neuronDrawn, lastLayerNeuronDrawn.Brush));
+            //    }
+            //}
 
             if (drawnNeurons.Count <= layerIndex)
                 drawnNeurons.Add(new List<object>());
@@ -264,7 +264,7 @@ namespace NeuralNetwork.UI.ViewModels
             button.Background = brush;
             button.Content = content;
             button.Click += delegate { click(layerIndex); };
-            
+
             Grid.SetColumn(button, gridPosition);
             Grid.SetRow(button, 0);
             grid.Children.Add(button);

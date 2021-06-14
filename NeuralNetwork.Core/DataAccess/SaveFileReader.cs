@@ -29,8 +29,15 @@ namespace NeuralNetwork.Core.DataAccess
         public async Task WriteSave(string path, Save save)
         {
             using StreamWriter sw = _fileSystem.File.CreateText(path);
-            string json = JsonSerializer.Serialize(save);
-            await sw.WriteAsync(json);
+            try
+            {
+                string json = JsonSerializer.Serialize(save);
+                await sw.WriteAsync(json);
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
         }
     }
 }

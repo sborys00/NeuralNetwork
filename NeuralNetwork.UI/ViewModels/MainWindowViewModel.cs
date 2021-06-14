@@ -90,6 +90,7 @@ namespace NeuralNetwork.UI.ViewModels
                 Save save = await _sfr.ReadSave(dialog.FileName);
                 _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Publish(save.TrainingDataset);
                 _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Publish(save.Network);
+                _eventAggregator.GetEvent<TrainingConfigUpdateEvent>().Publish(save.TrainingConfig);
             }
         }
     }

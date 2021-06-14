@@ -48,60 +48,26 @@ namespace NeuralNetwork.UI.ViewModels
             _eventAggregator.GetEvent<TrainingDatasetChangedEvent>().Subscribe(UpdateTrainingDataset);
             _eventAggregator.GetEvent<NeuralNetworkChangedEvent>().Subscribe(UpdateNetwork);
             _eventAggregator.GetEvent<SaveButtonClickedEvent>().Subscribe(SaveNetwork);
+            _eventAggregator.GetEvent<TrainingConfigUpdateEvent>().Subscribe(UpdateTrainingProperties);
 
             _learningManager.ActivationFunction = new SigmoidActivationFunction();
             _learningManager.LearningRate = 0.1;
 
             _eventAggregator.GetEvent<RequestNeuralNetworkUpdate>().Publish();
             _eventAggregator.GetEvent<RequestDatasetUpdate>().Publish();
-            
+
         }
+
         public DelegateCommand TrainForOneEpochCommand { get; set; }
         public DelegateCommand<int?> QuickStepsCommand { get; set; }
         public DelegateCommand InitializeWeightsCommand { get; set; }
         public DelegateCommand StartAutoTrainCommand { get; set; }
         public DelegateCommand StopAutoTrainCommand { get; set; }
 
-        public double ClassificationThreshold { get; set; } = 0.5;
-        public double TargetError { get; set; } = 0.01;
-        public int TargetEpoch { get; set; } = 1000;
-        public int NumberOfSteps { get; set; } = 10;
-
-        private int _speed;
-
-        public int Speed
-        {
-            get { return _speed; }
-            set
-            {
-                if (value <= 0)
-                    _speed = 1;
-                else
-                    _speed = value;
-            }
-        }
-
-        public double LearningRate
-        {
-            get { return _learningManager.LearningRate; }
-            set 
-            {
-                if (value < 0)
-                    return;
-                _learningManager.LearningRate = value;
-            }
-        }
-
-        public ActivationFuntion SelectedActivationFunction
-        {
-            get { return _learningManager.ActivationFunction; }
-            set 
-            {
-                _learningManager.ActivationFunction = value; 
-            }
-        }
-
-
+        public double ClassificationThreshold { get => classificationThreshold; set => SetProperty(ref classificationThreshold, value); }
+        public double TargetError { get => targetError; set => SetProperty(ref targetError, value); }
+        public int TargetEpoch { get => targetEpoch; set => SetProperty(ref targetEpoch, value); }
+        public int NumberOfSteps { get => numberOfSteps; set => SetProperty(ref numberOfSteps, value); }
         public PlotModel TotalErrorPlot { get; private set; }
         public LineSeries TrainingErrorSeries { get; set; }
         public LineSeries TestErrorSeries { get; set; }
@@ -110,20 +76,61 @@ namespace NeuralNetwork.UI.ViewModels
 
         public PlotModel ClassificationCorrectnessLinePlot { get; set; }
 
-        private LineSeries _classificationCorrectnessLineSeries;
+        private int _speed;
+        public int Speed
+        {
+            get { return _speed; }
+            set
+            {
+                if (value <= 0)
+                    _speed = 1;
+                else
+                    SetProperty(ref _speed, value);
+            }
+        }
+
+        public double LearningRate
+        {
+            get { return _learningManager.LearningRate; }
+            set
+            {
+                if (value < 0)
+                    return;
+                _learningManager.LearningRate = value;
+                RaisePropertyChanged(nameof(LearningRate));
+
+            }
+        }
+
+        public ActivationFuntion SelectedActivationFunction
+        {
+            get { return _learningManager.ActivationFunction; }
+            set
+            {
+                _learningManager.ActivationFunction = value;
+                RaisePropertyChanged(nameof(SelectedActivationFunction));
+
+            }
+        }
 
         private TrainingDataset trainingDataset;
-        private Timer timer;
 
         public TrainingDataset TrainingDataset
         {
             get { return trainingDataset; }
-            set 
-            { 
-                trainingDataset = value; 
+            set
+            {
+                SetProperty(ref trainingDataset, value);
             }
         }
 
+        private LineSeries _classificationCorrectnessLineSeries;
+
+        private Timer timer;
+        private int numberOfSteps = 10;
+        private int targetEpoch = 1000;
+        private double targetError = 0.01;
+        private double classificationThreshold = 0.5;
 
         public void TrainForOneEpoch()
         {
@@ -140,7 +147,7 @@ namespace NeuralNetwork.UI.ViewModels
             int epochs = count == null ? NumberOfSteps : Convert.ToInt32(count);
 
             TrainingResult[] trainingResult = _learningManager.TrainForMultipleEpochs(_network, epochs);
-            foreach(var result in trainingResult)
+            foreach (var result in trainingResult)
             {
                 TrainingErrorSeries.Points.Add(new DataPoint(TrainingErrorSeries.Points.Count + 1, result.TrainingExampleTotalError));
                 TestErrorSeries.Points.Add(new DataPoint(TestErrorSeries.Points.Count + 1, result.TestExampleTotalError));
@@ -193,13 +200,22 @@ namespace NeuralNetwork.UI.ViewModels
         private void UpdateNetwork(Network network)
         {
             _network = network;
-            InitializeWeights();
         }
-
+        private void UpdateTrainingProperties(TrainingConfig cfg)
+        {
+            LearningRate = cfg.LearningRate;
+            TargetEpoch = cfg.TargetEpoch;
+            TargetError = cfg.TargetError;
+            ClassificationThreshold = cfg.ClassificationThreshold;
+            NumberOfSteps = cfg.NumberOfSteps;
+            Speed = cfg.Speed;
+            Type t = Type.GetType(cfg.ActivationFunctionName);
+            SelectedActivationFunction = (ActivationFuntion)Activator.CreateInstance(t);
+        }
         private void UpdateClassificationCorrectnessLinePlot(TrainingResult trainingResult)
         {
             int correctCount = 0;
-            foreach(var result in trainingResult.testingResults)
+            foreach (var result in trainingResult.testingResults)
             {
                 bool correct = true;
                 for (int i = 0; i < result.actualValues.Length; i++)
@@ -220,7 +236,7 @@ namespace NeuralNetwork.UI.ViewModels
         {
             timer.Enabled = false;
             TrainForManyEpochs(Speed);
-            if(timer != null)
+            if (timer != null)
                 timer.Enabled = true;
 
             if (TrainingErrorSeries.Points.Last().Y <= TargetError || _learningManager.Epoch >= TargetEpoch)
@@ -232,11 +248,11 @@ namespace NeuralNetwork.UI.ViewModels
         {
             byte opacity = 140;
 
-            TotalErrorPlot = new PlotModel 
+            TotalErrorPlot = new PlotModel
             {
                 Title = "Total Error",
                 PlotAreaBorderColor = OxyColors.Transparent,
-                TextColor = OxyColor.FromArgb(160,255,255,255)
+                TextColor = OxyColor.FromArgb(160, 255, 255, 255)
             };
             TrainingErrorSeries = new()
             {
@@ -281,12 +297,25 @@ namespace NeuralNetwork.UI.ViewModels
             };
             saveFileDialog.ShowDialog();
 
+            TrainingConfig cfg = new()
+            {
+                LearningRate = LearningRate,
+                TargetEpoch = TargetEpoch,
+                TargetError = TargetError,
+                ClassificationThreshold = ClassificationThreshold,
+                NumberOfSteps = NumberOfSteps,
+                ActivationFunctionName = SelectedActivationFunction.GetType().AssemblyQualifiedName,
+                Speed = Speed
+            };
+
             if (saveFileDialog.FileName != "")
             {
                 Save save = new()
                 {
                     Network = _network,
-                    TrainingDataset = TrainingDataset
+                    TrainingDataset = TrainingDataset,
+                    TrainingConfig = cfg
+
                 };
                 _sfr.WriteSave(saveFileDialog.FileName, save);
             }
