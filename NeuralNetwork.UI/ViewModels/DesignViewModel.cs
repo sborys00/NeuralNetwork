@@ -231,17 +231,6 @@ namespace NeuralNetwork.UI.ViewModels
             return brushes;
         }
 
-        private List<SolidColorBrush> NeuronWeightsToBrush(int layerIndex, int neuronIndex)
-        {
-            _network.CalculateWeightBoundsForLayer(layerIndex, out double upperBound, out double lowerBound);
-            List<SolidColorBrush> brushes = new(_network.Layers[layerIndex].Neurons.Count);
-            foreach (var weight in _network.Layers[layerIndex].Neurons[neuronIndex].Weights)
-            {
-                brushes.Add(WeightToBrush(weight, upperBound, lowerBound));
-            }
-            return brushes;
-        }
-
         private SolidColorBrush WeightToBrush(double weight, double upperBound, double lowerBound)
         {
             var x = (weight + Math.Abs(lowerBound)) * 510 / (upperBound - lowerBound);
