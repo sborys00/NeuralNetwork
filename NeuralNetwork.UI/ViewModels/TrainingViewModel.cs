@@ -254,6 +254,11 @@ namespace NeuralNetwork.UI.ViewModels
                 PlotAreaBorderColor = OxyColors.Transparent,
                 TextColor = OxyColor.FromArgb(160, 255, 255, 255)
             };
+            TotalErrorPlot.Axes.Add(new LinearAxis
+            {
+                Position = AxisPosition.Left,
+                Minimum = 0,
+            });
             TrainingErrorSeries = new()
             {
                 Title = "Training",
@@ -276,8 +281,8 @@ namespace NeuralNetwork.UI.ViewModels
             ClassificationCorrectnessLinePlot.Axes.Add(new LinearAxis
             {
                 Position = AxisPosition.Left,
-                AbsoluteMaximum = 100,
-                AbsoluteMinimum = 0,
+                Maximum = 100,
+                Minimum = 0,            
             });
 
             _classificationCorrectnessLineSeries = new()
