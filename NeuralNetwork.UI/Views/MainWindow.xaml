@@ -120,25 +120,29 @@
                             <Button
                                 Name="HomeButton"
                                 Command="{Binding NavigateCommand}" 
-                                CommandParameter="HomeView">
+                                CommandParameter="HomeView"
+                                Margin="10 5 10 5">
                                 Home
                             </Button>
                             <Button
                                 Name="DataButton"
                                 Command="{Binding NavigateCommand}"
-                                CommandParameter="DataView">
+                                CommandParameter="DataView"
+                                Margin="10 5 10 5">
                                 Data
                             </Button>
                             <Button
                                 Name="DesignButton"
                                 Command="{Binding NavigateCommand}"
-                                CommandParameter="DesignView">
+                                CommandParameter="DesignView"
+                                Margin="10 5 10 5">
                                 Design
                             </Button>
                             <Button
                                 Name="TrainingButton"
                                 Command="{Binding NavigateCommand}"
-                                CommandParameter="TrainingView">
+                                CommandParameter="TrainingView"
+                                Margin="10 5 10 5">
                                 Training
                             </Button>
                             <WrapPanel
