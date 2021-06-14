@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace NeuralNetwork.UI.ViewModels
+namespace NeuralNetwork.UI.CustomGraphModels
 {
     class ColoredEdge<T> : Edge<T>
     {

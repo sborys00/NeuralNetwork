@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System;
 using System.Windows;
+using NeuralNetwork.UI.CustomGraphModels;
 
 namespace NeuralNetwork.UI.ViewModels
 {
