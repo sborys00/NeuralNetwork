@@ -1,0 +1,34 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style
+        x:Key="MainWindowStyle"
+        TargetType="{x:Type Window}">
+        <Setter
+            Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect
+                    Color="Black"
+                    Opacity="0.6"
+                    BlurRadius="10"
+                    Direction="270"
+                    RenderingBias="Quality"
+                    ShadowDepth="0" />
+            </Setter.Value>
+        </Setter>
+        <Setter
+            Property="BorderThickness"
+            Value="10" />
+        <Style.Triggers>
+            <DataTrigger
+                Binding="{Binding WindowState, RelativeSource={RelativeSource Self}}"
+                Value="Maximized">
+                <Setter
+                    Property="Effect"
+                    Value="{x:Null}" />
+                <Setter
+                    Property="BorderThickness"
+                    Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>
