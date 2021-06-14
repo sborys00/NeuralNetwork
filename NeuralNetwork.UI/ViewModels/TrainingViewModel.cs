@@ -124,7 +124,8 @@ namespace NeuralNetwork.UI.ViewModels
             }
         }
 
-        private LineSeries _classificationCorrectnessLineSeries;
+        private LineSeries _classificationCorrectnessTestLineSeries;
+        private LineSeries _classificationCorrectnessTrainingLineSeries;
 
         private Timer timer;
         private int numberOfSteps = 10;
@@ -163,7 +164,8 @@ namespace NeuralNetwork.UI.ViewModels
             _learningManager?.ResetEpochCounter();
             TestErrorSeries.Points.Clear();
             TrainingErrorSeries.Points.Clear();
-            _classificationCorrectnessLineSeries.Points.Clear();
+            _classificationCorrectnessTestLineSeries.Points.Clear();
+            _classificationCorrectnessTrainingLineSeries.Points.Clear();
             TotalErrorPlot.InvalidatePlot(true);
             ClassificationCorrectnessLinePlot.InvalidatePlot(true);
         }
@@ -214,8 +216,16 @@ namespace NeuralNetwork.UI.ViewModels
         }
         private void UpdateClassificationCorrectnessLinePlot(TrainingResult trainingResult)
         {
+            double testPercentage = CalculatePercentageOfCorrectClassification(trainingResult.testingResults);
+            double trainingPercentage = CalculatePercentageOfCorrectClassification(trainingResult.trainingResults);
+            _classificationCorrectnessTestLineSeries.Points.Add(new DataPoint(_classificationCorrectnessTestLineSeries.Points.Count + 1, testPercentage));
+            _classificationCorrectnessTrainingLineSeries.Points.Add(new DataPoint(_classificationCorrectnessTrainingLineSeries.Points.Count + 1, trainingPercentage));
+        }
+
+        private double CalculatePercentageOfCorrectClassification(TestResult[] results)
+        {
             int correctCount = 0;
-            foreach (var result in trainingResult.testingResults)
+            foreach (var result in results)
             {
                 bool correct = true;
                 for (int i = 0; i < result.actualValues.Length; i++)
@@ -228,8 +238,7 @@ namespace NeuralNetwork.UI.ViewModels
                 if (correct)
                     correctCount++;
             }
-            double correctPercentage = 100d * correctCount / trainingResult.testingResults.Length;
-            _classificationCorrectnessLineSeries.Points.Add(new DataPoint(_classificationCorrectnessLineSeries.Points.Count + 1, correctPercentage));
+            return 100d * correctCount / results.Length;
         }
 
         private void OnTimedEvent(Object source, ElapsedEventArgs e)
@@ -285,11 +294,18 @@ namespace NeuralNetwork.UI.ViewModels
                 Minimum = 0,            
             });
 
-            _classificationCorrectnessLineSeries = new()
+            _classificationCorrectnessTestLineSeries = new()
             {
+                Title = "Test",
                 Color = OxyColor.FromAColor(opacity, OxyColors.DeepSkyBlue)
             };
-            ClassificationCorrectnessLinePlot.Series.Add(_classificationCorrectnessLineSeries);
+            _classificationCorrectnessTrainingLineSeries = new()
+            {
+                Title = "Training",
+                Color = OxyColor.FromAColor(opacity, OxyColors.Red)
+            };
+            ClassificationCorrectnessLinePlot.Series.Add(_classificationCorrectnessTestLineSeries);
+            ClassificationCorrectnessLinePlot.Series.Add(_classificationCorrectnessTrainingLineSeries);
         }
 
         private void SaveNetwork()
