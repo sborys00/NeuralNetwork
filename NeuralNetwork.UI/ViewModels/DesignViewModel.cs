@@ -260,17 +260,17 @@ namespace NeuralNetwork.UI.ViewModels
 
         private void DrawAddButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid)
         {
-            DrawButton(graph, layerIndex, grid, 0, "addNeuronButton", "+1", new SolidColorBrush { Color = Colors.Green }, AddNeuron);
+            DrawButton(graph, layerIndex, grid, 0, "addNeuronButton", "+1", new SolidColorBrush { Color = Color.FromArgb(180, 37, 214, 49) }, AddNeuron);
         }
 
         private void DrawRemoveButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid)
         {
-            DrawButton(graph, layerIndex, grid, 1, "removeNeuronButton", "-1", new SolidColorBrush { Color = Colors.Red }, RemoveNeuron);
+            DrawButton(graph, layerIndex, grid, 1, "removeNeuronButton", "-1", new SolidColorBrush { Color = Color.FromArgb(180, 230, 228, 35) }, RemoveNeuron);
         }
 
         private void DrawRemoveLayerButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid)
         {
-            DrawButton(graph, layerIndex, grid, 2, "removeLayerButton", "-n", new SolidColorBrush { Color = Colors.Red }, RemoveLayer);
+            DrawButton(graph, layerIndex, grid, 2, "removeLayerButton", "X", new SolidColorBrush { Color = Color.FromArgb(180, 230, 35, 35) }, RemoveLayer);
         }
 
         private void DrawButton(BidirectionalGraph<object, IEdge<object>> graph, int layerIndex, Grid grid, int gridPosition, string name, string content, SolidColorBrush brush, Action<int> click)
@@ -279,10 +279,9 @@ namespace NeuralNetwork.UI.ViewModels
             button.Name = name + $"_{layerIndex}";
             button.Width = neuronSize * 2;
             button.Height = neuronSize;
-            button.Background = brush;
             button.Content = content;
+            button.Background = brush;
             button.Click += delegate { click(layerIndex); };
-
             Grid.SetColumn(button, gridPosition);
             Grid.SetRow(button, 0);
             grid.Children.Add(button);

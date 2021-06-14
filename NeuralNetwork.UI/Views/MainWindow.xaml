@@ -13,7 +13,6 @@
     mc:Ignorable="d"
     AllowsTransparency="True"
     WindowStyle="None"
-    BorderThickness="10"
     Title="Neural Network"
     MinHeight="500"
     MinWidth="800"
@@ -26,16 +25,8 @@
     TextOptions.TextFormattingMode="Ideal"
     TextOptions.TextRenderingMode="Auto"
     Background="{DynamicResource MaterialDesignPaper}"
-    FontFamily="{DynamicResource MaterialDesignFont}">
-    <Window.Effect>
-        <DropShadowEffect
-            Color="Black"
-            Opacity="0.6"
-            BlurRadius="10"
-            Direction="270"
-            RenderingBias="Quality"
-            ShadowDepth="0" />
-    </Window.Effect>
+    FontFamily="{DynamicResource MaterialDesignFont}"
+    Style="{DynamicResource MainWindowStyle}">
     <WindowChrome.WindowChrome>
         <WindowChrome
             CaptionHeight="30"
@@ -53,6 +44,8 @@
                     Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Shadows.xaml" />
                 <ResourceDictionary
                     Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
+                <ResourceDictionary
+                    Source="../Styles/MainWindowStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -120,25 +113,29 @@
                             <Button
                                 Name="HomeButton"
                                 Command="{Binding NavigateCommand}" 
-                                CommandParameter="HomeView">
+                                CommandParameter="HomeView"
+                                Margin="10 5 10 5">
                                 Home
                             </Button>
                             <Button
                                 Name="DataButton"
                                 Command="{Binding NavigateCommand}"
-                                CommandParameter="DataView">
+                                CommandParameter="DataView"
+                                Margin="10 5 10 5">
                                 Data
                             </Button>
                             <Button
                                 Name="DesignButton"
                                 Command="{Binding NavigateCommand}"
-                                CommandParameter="DesignView">
+                                CommandParameter="DesignView"
+                                Margin="10 5 10 5">
                                 Design
                             </Button>
                             <Button
                                 Name="TrainingButton"
                                 Command="{Binding NavigateCommand}"
-                                CommandParameter="TrainingView">
+                                CommandParameter="TrainingView"
+                                Margin="10 5 10 5">
                                 Training
                             </Button>
                             <WrapPanel
